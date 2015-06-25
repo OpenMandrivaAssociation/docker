@@ -14,7 +14,7 @@ Version:        1.6.2
 Release:        1
 Summary:        Automates deployment of containerized applications
 License:        ASL 2.0
-Group:		System/Configuration
+Group:		System/Kernel and hardware
 
 URL:            http://www.docker.com
 # only x86_64 for now: https://github.com/docker/docker/issues/136
