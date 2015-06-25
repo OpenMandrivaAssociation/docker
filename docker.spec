@@ -21,6 +21,7 @@ URL:            http://www.docker.com
 ExclusiveArch:  x86_64
 Source0:        https://%{import_path}/archive/v%{version}.tar.gz
 #Source0:        https://%{import_path}/archive/%{commit}.tar.gz
+Source100:	%{name}.rpmlintrc
 BuildRequires:  gcc
 BuildRequires:  glibc-static-devel
 

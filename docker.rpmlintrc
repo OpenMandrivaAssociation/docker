@@ -1,0 +1,2 @@
+# # modifying the dockerinit binary breaks the SHA1 sum check by docker
+addFilter("unstripped-binary-or-object")
