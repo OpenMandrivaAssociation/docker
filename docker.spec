@@ -9,6 +9,9 @@
 %global gopath  %{_libdir}/golang
 %define gosrc %{gopath}/src/%{import_path}
 
+%global commit      97cd073598275fa468fb3051952bd11002830c8e
+%global shortcommit %(c=%{commit}; echo ${c:0:7})
+
 Name:           docker
 Version:        1.6.2
 Release:        1
