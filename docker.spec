@@ -6,11 +6,11 @@
 #debuginfo not supported with Go
 %global debug_package %{nil}
 %global import_path github.com/docker/docker
-%global gopath  %{_libdir}/golang
+%global gopath  %{_libdir}/go
 %define gosrc %{gopath}/src/%{import_path}
 
 Name:           docker
-Version:        1.6.2
+Version:        1.7.1
 Release:        1
 Summary:        Automates deployment of containerized applications
 License:        ASL 2.0
@@ -21,16 +21,16 @@ URL:            http://www.docker.com
 ExclusiveArch:  x86_64
 Source0:        https://%{import_path}/archive/v%{version}.tar.gz
 #Source0:        https://%{import_path}/archive/%{commit}.tar.gz
-BuildRequires:  gcc
+#BuildRequires:  gcc
 BuildRequires:  glibc-static-devel
 
 # ensure build uses golang 1.2-7 and above
 # http://code.google.com/p/go/source/detail?r=a15f344a9efa35ef168c8feaa92a15a1cdc93db5
 BuildRequires:  golang >= 1.3.3
 
-BuildRequires:  sqlite3-devel
+BuildRequires:  pkgconfig(sqlite3)
 
-BuildRequires:  golang-net-devel
+#BuildRequires:  golang-net-devel
 # Provided by this version of docker - doesn'- wompile without these versions
 #BuildRequires:  golang(github.com/gorilla/mux)
 #BuildRequires:  golang(github.com/gorilla/context)
@@ -175,16 +175,14 @@ specific logic. The import paths of %{import_path}/pkg/...
 #done
 
 %build
+mkdir -p bfd
+ln -s %{_bindir}/ld.bfd bfd/ld
+export PATH=$PWD/bfd:$PATH
 #mkdir -p _build
-
-#pushd _build
-  #mkdir -p src/github.com/docker
-  #ln -s $(dirs +1 -l) src/github.com/docker/docker
-#popd
+export CC=gcc
+export CXX=g++
 
 export DOCKER_GITCOMMIT="%{shortcommit}"
-#export DOCKER_GITCOMMIT="%{shortcommit}/%{version}"
-#export GOPATH=$(pwd)/_build:$(pwd)/vendor:%{gopath}
 
 export CFLAGS="-I/usr/share/go/src/runtime"
 AUTO_GOPATH=1 ./hack/make.sh dynbinary
