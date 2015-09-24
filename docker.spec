@@ -1,4 +1,5 @@
 %define _libexecdir /usr/libexec
+%define debugcflags %nil
 
 # modifying the dockerinit binary breaks the SHA1 sum check by docker
 %global __os_install_post %{_usrlibrpm}/brp-compress
@@ -10,7 +11,7 @@
 %define gosrc %{gopath}/src/%{import_path}
 
 Name:           docker
-Version:        1.7.1
+Version:        1.8.2
 Release:        1
 Summary:        Automates deployment of containerized applications
 License:        ASL 2.0
@@ -178,15 +179,14 @@ specific logic. The import paths of %{import_path}/pkg/...
 mkdir -p bfd
 ln -s %{_bindir}/ld.bfd bfd/ld
 export PATH=$PWD/bfd:$PATH
-#mkdir -p _build
 export CC=gcc
 export CXX=g++
 
 export DOCKER_GITCOMMIT="%{shortcommit}"
-
-export CFLAGS="-I/usr/share/go/src/runtime"
-AUTO_GOPATH=1 ./hack/make.sh dynbinary
-#hack/make.sh dynbinary
+export CGO_CFLAGS="-I%{_includedir}"
+export CGO_LDFLAGS="-L%{_libdir}"
+AUTO_GOPATH=1
+./hack/make.sh dynbinary
 docs/man/md2man-all.sh
 cp contrib/syntax/vim/LICENSE LICENSE-vim-syntax
 cp contrib/syntax/vim/README.md README-vim-syntax.md
