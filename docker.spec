@@ -227,7 +227,7 @@ do
 	cp -rpav $dir %{buildroot}/%{gosrc}
 done
 
-find . -name "*~" -exec rm -rf {} \;
+find %{buildroot} -name "*~" -exec rm -rf {} \;
 
 %pre
 getent group docker > /dev/null || %{_sbindir}/groupadd -r docker
