@@ -20,8 +20,6 @@ Summary:        Automates deployment of containerized applications
 License:        ASL 2.0
 Group:		System/Base
 URL:            http://www.docker.com
-# only x86_64 for now: https://github.com/docker/docker/issues/136
-ExclusiveArch:  x86_64
 Source0:        https://%{import_path}/archive/v%{version}.tar.gz
 Source1:	docker.rpmlintrc
 Patch0:		01-golang15.patch
