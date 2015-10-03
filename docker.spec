@@ -62,7 +62,6 @@ servers, OpenStack clusters, public instances, or combinations of the above.
 %package devel
 BuildRequires:  golang >= 1.3.3
 Requires:       golang >= 1.3.3
-Requires:       docker-pkg-devel
 Summary:        A golang registry for global request variables (source libraries)
 Provides:       golang(%{import_path}) = %{version}-%{release}
 Provides:       golang(%{import_path}/api) = %{version}-%{release}
