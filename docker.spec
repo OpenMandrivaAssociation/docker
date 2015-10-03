@@ -164,7 +164,6 @@ export DOCKER_GITCOMMIT="%{shortcommit}"
 export CGO_CFLAGS="-I%{_includedir}"
 export CGO_LDFLAGS="-L%{_libdir}"
 export AUTO_GOPATH=1
-export LDFLAGS="-X main.GITCOMMIT %{version} -X main.VERSION %{version} -w -linkmode external -extldflags '%{ldflags}' -extld 'clang -stdlib=libc++'"
 
 DEBUG=1 ./hack/make.sh dynbinary
 ./man/md2man-all.sh
