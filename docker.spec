@@ -20,8 +20,6 @@ Summary:        Automates deployment of containerized applications
 License:        ASL 2.0
 Group:		System/Base
 URL:            http://www.docker.com
-# only x86_64 for now: https://github.com/docker/docker/issues/136
-ExclusiveArch:  x86_64
 Source0:        https://%{import_path}/archive/v%{version}.tar.gz
 Source1:	docker.rpmlintrc
 Patch0:		01-golang15.patch
@@ -166,6 +164,8 @@ export DOCKER_GITCOMMIT="%{shortcommit}"
 export CGO_CFLAGS="-I%{_includedir}"
 export CGO_LDFLAGS="-L%{_libdir}"
 export AUTO_GOPATH=1
+export LDFLAGS="-X main.GITCOMMIT %{version} -X main.VERSION %{version} -w -linkmode external -extldflags '%{ldflags}' -extld 'clang -stdlib=libc++'"
+
 DEBUG=1 ./hack/make.sh dynbinary
 ./man/md2man-all.sh
 cp contrib/syntax/vim/LICENSE LICENSE-vim-syntax
