@@ -14,7 +14,7 @@
 %define project %{name}
 
 Name:           docker
-Version:        1.8.2
+Version:        1.8.3
 Release:        1
 Summary:        Automates deployment of containerized applications
 License:        ASL 2.0
