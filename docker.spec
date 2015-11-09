@@ -14,7 +14,7 @@
 %define project %{name}
 
 Name:           docker
-Version:        1.8.3
+Version:        1.9.0
 Release:        1
 Summary:        Automates deployment of containerized applications
 License:        ASL 2.0
@@ -22,7 +22,7 @@ Group:		System/Base
 URL:            http://www.docker.com
 Source0:        https://%{import_path}/archive/v%{version}.tar.gz
 Source1:	docker.rpmlintrc
-Patch0:		01-golang15.patch
+#Patch0:		01-golang15.patch
 BuildRequires:  glibc-static-devel
 
 BuildRequires:  golang
@@ -228,7 +228,7 @@ perl -pi -e "s|^SocketGroup=docker|SocketGroup=docker\n# So do it another way\nE
 install -d -p %{buildroot}/%{gosrc}
 
 for dir in api autogen daemon graph \
-           image links opts pkg registry runconfig utils
+           image opts pkg registry runconfig utils
 do
 	cp -rpav $dir %{buildroot}/%{gosrc}
 done
