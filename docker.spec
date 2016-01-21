@@ -41,6 +41,7 @@ Requires:       xz
 # No longer needed in Fedora because of libcontainer
 Requires:       libcgroup
 Requires:	e2fsprogs
+Requires:	iptables
 
 Obsoletes: docker-io < 1.2.0-8
 Provides: docker-io = %{version}-%{release}
