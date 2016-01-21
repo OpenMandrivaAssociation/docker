@@ -40,7 +40,7 @@ Requires:       xz
 # https://bugzilla.redhat.com/show_bug.cgi?id=1034919
 # No longer needed in Fedora because of libcontainer
 Requires:       libcgroup
-Provides:       lxc-docker = %{version}
+Requires:	e2fsprogs
 
 Obsoletes: docker-io < 1.2.0-8
 Provides: docker-io = %{version}-%{release}
