@@ -14,7 +14,7 @@
 %define project %{name}
 
 Name:           docker
-Version:        1.9.0
+Version:        1.9.1
 Release:        1
 Summary:        Automates deployment of containerized applications
 License:        ASL 2.0
