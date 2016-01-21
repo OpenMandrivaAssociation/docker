@@ -37,10 +37,6 @@ Requires:       systemd-units
 # need xz to work with ubuntu images
 # https://bugzilla.redhat.com/show_bug.cgi?id=1045220
 Requires:       xz
-# https://bugzilla.redhat.com/show_bug.cgi?id=1035436
-# this won't be needed for rhel7+
-Requires:       bridge-utils
-Requires:       lxc
 # https://bugzilla.redhat.com/show_bug.cgi?id=1034919
 # No longer needed in Fedora because of libcontainer
 Requires:       libcgroup
