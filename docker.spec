@@ -164,14 +164,6 @@ export CGO_CFLAGS="-I%{_includedir}"
 export CGO_LDFLAGS="-L%{_libdir}"
 export AUTO_GOPATH=1
 
-%ifarch %armx %{ix86}
-# ARMx issue
-# https://github.com/docker/docker/issues/15053
-# https://github.com/docker/docker/issues/14056
-mv vendor/src/github.com/opencontainers/runc/libcontainer/seccomp/{jump_amd64.go,jump_linux.go}
-sed -i 's/,amd64//' vendor/src/github.com/opencontainers/runc/libcontainer/seccomp/jump_linux.go
-%endif
-
 DEBUG=1 ./hack/make.sh dynbinary
 ./man/md2man-all.sh
 cp contrib/syntax/vim/LICENSE LICENSE-vim-syntax
