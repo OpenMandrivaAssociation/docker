@@ -22,6 +22,7 @@ Group:		System/Base
 URL:            http://www.docker.com
 Source0:        https://%{import_path}/archive/v%{version}.tar.gz
 Source1:	docker.rpmlintrc
+Source2:	docker.conf
 #Patch0:		01-golang15.patch
 BuildRequires:  glibc-static-devel
 
@@ -184,6 +185,9 @@ install -p -m 644 man/man1/docker*.1 %{buildroot}%{_mandir}/man1
 install -d %{buildroot}%{_mandir}/man5
 install -p -m 644 man/man5/Dockerfile.5 %{buildroot}%{_mandir}/man5
 
+# sysconfig
+install -d %{buildroot}%{_sysconfdir}
+install -p -m 644 %{SOURCE2} %{buildroot}%{_sysconfdir}/docker
 # install bash completion
 install -d %{buildroot}%{_sysconfdir}/bash_completion.d
 install -p -m 644 contrib/completion/bash/docker %{buildroot}%{_sysconfdir}/bash_completion.d/docker.bash
@@ -245,6 +249,7 @@ exit 0
 %{_bindir}/docker
 %dir %{_libexecdir}/docker
 %dir %{_libexecdir}/cache/docker
+%{_sysconfdir}/docker
 %{_libexecdir}/docker/dockerinit
 %{_unitdir}/docker.service
 %{_unitdir}/docker.socket
