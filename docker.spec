@@ -227,6 +227,7 @@ do
 done
 
 find %{buildroot} -name "*~" -exec rm -rf {} \;
+find %{buildroot}%{go_dir}/src/github.com/ -type d -exec chmod 0755 {} \;
 
 %pre
 getent group docker > /dev/null || %{_sbindir}/groupadd -r docker
