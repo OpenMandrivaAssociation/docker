@@ -1,0 +1,14 @@
+diff --git a/contrib/init/systemd/docker.service b/contrib/init/systemd/docker.service
+index ab5bc8f..4c6d4ce 100644
+--- a/contrib/init/systemd/docker.service
++++ b/contrib/init/systemd/docker.service
+@@ -6,7 +6,8 @@ Requires=docker.socket
+ 
+ [Service]
+ Type=notify
+-ExecStart=/usr/bin/docker daemon -H fd:// --exec-opt native.cgroupdriver=cgroupfs
++EnvironmentFile=-/etc/sysconfig/docker
++ExecStart=/usr/bin/docker daemon $DOCKER_OPTS -H fd:// --exec-opt native.cgroupdriver=cgroupfs
+ MountFlags=slave
+ LimitNOFILE=1048576
+ LimitNPROC=1048576

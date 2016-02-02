@@ -23,7 +23,9 @@ URL:            http://www.docker.com
 Source0:        https://%{import_path}/archive/v%{version}.tar.gz
 Source1:	docker.rpmlintrc
 Source2:	docker.conf
-#Patch0:		01-golang15.patch
+Patch0:		02-fix-unified-cgroup.patch
+Patch1:		aarch64.patch
+Patch2:		docker-1.9.1-dockeropts-service.patch
 BuildRequires:  glibc-static-devel
 
 BuildRequires:  golang
@@ -250,7 +252,7 @@ exit 0
 %{_bindir}/docker
 %dir %{_libexecdir}/docker
 %dir %{_libexecdir}/cache/docker
-%{_sysconfdir}/docker
+%config(noreplace) %{_sysconfdir}/docker
 %{_libexecdir}/docker/dockerinit
 %{_unitdir}/docker.service
 %{_unitdir}/docker.socket
