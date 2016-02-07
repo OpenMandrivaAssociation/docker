@@ -14,8 +14,8 @@
 %define project %{name}
 
 Name:           docker
-Version:        1.9.1
-Release:        2
+Version:        1.10.0
+Release:        1
 Summary:        Automates deployment of containerized applications
 License:        ASL 2.0
 Group:		System/Base
@@ -24,8 +24,7 @@ Source0:        https://%{import_path}/archive/v%{version}.tar.gz
 Source1:	docker.rpmlintrc
 Source2:	docker.conf
 Patch0:		02-fix-unified-cgroup.patch
-Patch1:		aarch64.patch
-Patch2:		docker-1.9.1-dockeropts-service.patch
+Patch1:		docker-1.9.1-dockeropts-service.patch
 BuildRequires:  glibc-static-devel
 
 BuildRequires:  golang
@@ -155,6 +154,8 @@ This package installs %{summary}.
 #done
 
 %build
+export CC=gcc
+export CXX=g++
 sed -i 's!external!internal!g' hack/make.sh
 mkdir -p bfd
 ln -s %{_bindir}/ld.bfd bfd/ld
@@ -222,7 +223,7 @@ perl -pi -e "s|^SocketGroup=docker|SocketGroup=docker\n# So do it another way\nE
 # sources
 install -d -p %{buildroot}/%{gosrc}
 
-for dir in api autogen daemon graph \
+for dir in api autogen daemon \
            image opts pkg registry runconfig utils
 do
 	cp -rpav $dir %{buildroot}/%{gosrc}
