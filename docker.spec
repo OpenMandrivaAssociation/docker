@@ -15,7 +15,7 @@
 
 Name:           docker
 Version:        1.10.0
-Release:        1
+Release:        2
 Summary:        Automates deployment of containerized applications
 License:        ASL 2.0
 Group:		System/Base
@@ -190,7 +190,7 @@ install -p -m 644 man/man5/Dockerfile.5 %{buildroot}%{_mandir}/man5
 
 # sysconfig
 install -d %{buildroot}%{_sysconfdir}
-install -p -m 644 %{SOURCE2} %{buildroot}%{_sysconfdir}/docker
+install -p -m 644 %{SOURCE2} %{buildroot}%{_sysconfdir}/sysconfig/docker
 # install bash completion
 install -d %{buildroot}%{_sysconfdir}/bash_completion.d
 install -p -m 644 contrib/completion/bash/docker %{buildroot}%{_sysconfdir}/bash_completion.d/docker.bash
@@ -253,7 +253,7 @@ exit 0
 %{_bindir}/docker
 %dir %{_libexecdir}/docker
 %dir %{_libexecdir}/cache/docker
-%config(noreplace) %{_sysconfdir}/docker
+%config(noreplace) %{_sysconfdir}/sysconfig/docker
 %{_libexecdir}/docker/dockerinit
 %{_unitdir}/docker.service
 %{_unitdir}/docker.socket
