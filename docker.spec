@@ -189,7 +189,7 @@ install -d %{buildroot}%{_mandir}/man5
 install -p -m 644 man/man5/Dockerfile.5 %{buildroot}%{_mandir}/man5
 
 # sysconfig
-install -d %{buildroot}%{_sysconfdir}
+install -d %{buildroot}%{_sysconfdir}/sysconfig
 install -p -m 644 %{SOURCE2} %{buildroot}%{_sysconfdir}/sysconfig/docker
 # install bash completion
 install -d %{buildroot}%{_sysconfdir}/bash_completion.d
