@@ -6,9 +6,9 @@ index ab5bc8f..4c6d4ce 100644
  
  [Service]
  Type=notify
--ExecStart=/usr/bin/docker daemon -H fd:// --exec-opt native.cgroupdriver=cgroupfs
+-ExecStart=/usr/bin/docker daemon -H fd://
 +EnvironmentFile=-/etc/sysconfig/docker
-+ExecStart=/usr/bin/docker daemon $DOCKER_OPTS -H fd:// --exec-opt native.cgroupdriver=cgroupfs
++ExecStart=/usr/bin/docker daemon $DOCKER_OPTS -H fd://
  MountFlags=slave
  LimitNOFILE=1048576
  LimitNPROC=1048576

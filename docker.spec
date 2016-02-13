@@ -14,8 +14,8 @@
 %define project %{name}
 
 Name:           docker
-Version:        1.10.0
-Release:        2
+Version:        1.10.1
+Release:        1
 Summary:        Automates deployment of containerized applications
 License:        ASL 2.0
 Group:		System/Base
@@ -23,8 +23,7 @@ URL:            http://www.docker.com
 Source0:        https://%{import_path}/archive/v%{version}.tar.gz
 Source1:	docker.rpmlintrc
 Source2:	docker.conf
-Patch0:		02-fix-unified-cgroup.patch
-Patch1:		docker-1.9.1-dockeropts-service.patch
+Patch0:		docker-1.9.1-dockeropts-service.patch
 BuildRequires:  glibc-static-devel
 
 BuildRequires:  golang
