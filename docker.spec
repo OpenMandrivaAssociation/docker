@@ -12,10 +12,11 @@
 %define provider github
 %define provider_tld com
 %define project %{name}
+%define	shortcommit 9e83765
 
 Name:           docker
 Version:        1.10.1
-Release:        1
+Release:        2
 Summary:        Automates deployment of containerized applications
 License:        ASL 2.0
 Group:		System/Base
