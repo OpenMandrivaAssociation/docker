@@ -15,8 +15,8 @@
 %define	shortcommit 9e83765
 
 Name:           docker
-Version:        1.10.1
-Release:        2
+Version:        1.10.2
+Release:        1
 Summary:        Automates deployment of containerized applications
 License:        ASL 2.0
 Group:		System/Base
@@ -44,6 +44,7 @@ Requires:       xz
 Requires:       libcgroup
 Requires:	e2fsprogs
 Requires:	iptables
+Requires:	aufs-util
 
 Obsoletes: docker-io < 1.2.0-8
 Provides: docker-io = %{version}-%{release}
