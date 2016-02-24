@@ -16,7 +16,7 @@
 
 Name:           docker
 Version:        1.10.2
-Release:        1
+Release:        2
 Summary:        Automates deployment of containerized applications
 License:        ASL 2.0
 Group:		System/Base
