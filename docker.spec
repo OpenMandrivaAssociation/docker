@@ -15,7 +15,7 @@
 
 Name:           docker
 Version:        1.10.2
-Release:        1
+Release:        2
 Summary:        Automates deployment of containerized applications
 License:        ASL 2.0
 Group:		System/Base
@@ -34,6 +34,7 @@ BuildRequires:  device-mapper-devel
 BuildRequires:  btrfs-devel
 BuildRequires:  pkgconfig(systemd)
 Requires:       systemd-units
+Requires:       aufs-util
 
 # need xz to work with ubuntu images
 # https://bugzilla.redhat.com/show_bug.cgi?id=1045220
