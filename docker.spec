@@ -12,6 +12,7 @@
 %define provider github
 %define provider_tld com
 %define project %{name}
+%define shortcommit c3959b1
 
 Name:           docker
 Version:        1.10.2
