@@ -15,8 +15,8 @@
 %define shortcommit c3959b1
 
 Name:           docker
-Version:        1.10.2
-Release:        2
+Version:        1.10.3
+Release:        1
 Summary:        Automates deployment of containerized applications
 License:        ASL 2.0
 Group:		System/Base
