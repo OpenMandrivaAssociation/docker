@@ -44,7 +44,6 @@ Requires:       xz
 Requires:       libcgroup
 Requires:	e2fsprogs
 Requires:	iptables
-Requires:	aufs-util
 
 Obsoletes: docker-io < 1.2.0-8
 Provides: docker-io = %{version}-%{release}
