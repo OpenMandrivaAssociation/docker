@@ -12,11 +12,11 @@
 %define provider github
 %define provider_tld com
 %define project %{name}
-%define	shortcommit 9e83765
+%define	shortcommit 4dc5990
 
 Name:           docker
-Version:        1.10.3
-Release:        1.1
+Version:        1.11.0
+Release:        1
 Summary:        Automates deployment of containerized applications
 License:        ASL 2.0
 Group:		System/Base
@@ -24,16 +24,17 @@ URL:            http://www.docker.com
 Source0:        https://%{import_path}/archive/v%{version}.tar.gz
 Source1:	docker.rpmlintrc
 Source2:	docker.conf
-Patch0:		docker-1.9.1-dockeropts-service.patch
+Patch0:		docker-1.11.0-dockeropts-service.patch
 BuildRequires:  glibc-static-devel
 
 BuildRequires:  golang
 BuildRequires:  pkgconfig(sqlite3)
 
 BuildRequires:  go-md2man
-BuildRequires:  device-mapper-devel
-BuildRequires:  btrfs-devel
 BuildRequires:  pkgconfig(systemd)
+BuildRequires:	pkgconfig(libsystemd-journal)
+BuildRequires:	pkgconfig(devmapper)
+BuildRequires:	btrfs-devel
 Requires:       systemd-units
 
 # need xz to work with ubuntu images
@@ -145,7 +146,6 @@ Requires:	vim
 This package installs %{summary}.
 
 %prep
-#%setup -q -n docker-%{commit}
 %setup -q -n docker-%{version}
 %apply_patches
 #rm -rf vendor/src/code.google.com vendor/src/github.com/{coreos,docker/libtrust,godbus,gorilla,kr,syndtr,tchap}
@@ -154,12 +154,12 @@ This package installs %{summary}.
 #done
 
 %build
-export CC=gcc
-export CXX=g++
-sed -i 's!external!internal!g' hack/make.sh
-mkdir -p bfd
-ln -s %{_bindir}/ld.bfd bfd/ld
-export PATH=$PWD/bfd:$PATH
+#export CC=gcc
+#export CXX=g++
+#sed -i 's!external!internal!g' hack/make.sh
+#mkdir -p bfd
+#ln -s %{_bindir}/ld.bfd bfd/ld
+#export PATH=$PWD/bfd:$PATH
 export DOCKER_GITCOMMIT="%{shortcommit}"
 export CGO_CFLAGS="-I%{_includedir}"
 export CGO_LDFLAGS="-L%{_libdir}"
@@ -174,10 +174,6 @@ cp contrib/syntax/vim/README.md README-vim-syntax.md
 # install binary
 install -d %{buildroot}%{_bindir}
 install -p -m 755 bundles/%{version}/dynbinary/docker-%{version} %{buildroot}%{_bindir}/docker
-
-# install dockerinit
-install -d %{buildroot}%{_libexecdir}/docker
-install -p -m 755 bundles/%{version}/dynbinary/dockerinit-%{version} %{buildroot}%{_libexecdir}/docker/dockerinit
 
 # Place to store images
 install -d %{buildroot}%{_libexecdir}/cache/docker
@@ -251,10 +247,7 @@ exit 0
 %{_mandir}/man1/docker*.1.gz
 %{_mandir}/man5/Dockerfile.5.gz
 %{_bindir}/docker
-%dir %{_libexecdir}/docker
-%dir %{_libexecdir}/cache/docker
 %config(noreplace) %{_sysconfdir}/sysconfig/docker
-%{_libexecdir}/docker/dockerinit
 %{_unitdir}/docker.service
 %{_unitdir}/docker.socket
 %dir %{_sysconfdir}/bash_completion.d

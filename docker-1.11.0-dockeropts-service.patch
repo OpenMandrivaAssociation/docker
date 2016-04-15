@@ -1,13 +1,16 @@
 diff --git a/contrib/init/systemd/docker.service b/contrib/init/systemd/docker.service
-index ab5bc8f..4c6d4ce 100644
+index 75cb68c..63670c2 100644
 --- a/contrib/init/systemd/docker.service
 +++ b/contrib/init/systemd/docker.service
-@@ -6,7 +6,8 @@ Requires=docker.socket
+@@ -6,10 +6,11 @@ Requires=docker.socket
  
  [Service]
  Type=notify
--ExecStart=/usr/bin/docker daemon -H fd://
 +EnvironmentFile=-/etc/sysconfig/docker
+ # the default is not to use systemd for cgroups because the delegate issues still
+ # exists and systemd currently does not support the cgroup feature set required
+ # for containers run by docker
+-ExecStart=/usr/bin/docker daemon -H fd://
 +ExecStart=/usr/bin/docker daemon $DOCKER_OPTS -H fd://
  MountFlags=slave
  LimitNOFILE=1048576
