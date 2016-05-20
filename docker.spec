@@ -15,7 +15,7 @@
 %define	shortcommit 4dc5990
 
 Name:           docker
-Version:        1.11.0
+Version:        1.11.1
 Release:        1
 Summary:        Automates deployment of containerized applications
 License:        ASL 2.0
