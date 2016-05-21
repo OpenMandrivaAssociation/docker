@@ -9,7 +9,7 @@
  		if err != nil {
  			logrus.Fatal(err)
  		}
-+		ls = wrapListeners(protoAddr, ls)
++		ls = wrapListeners(protoAddrParts[0], ls)
  
  		logrus.Debugf("Listener created for HTTP on %s (%s)", protoAddrParts[0], protoAddrParts[1])
 -		api.Accept(protoAddrParts[1], l...)
