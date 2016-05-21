@@ -16,7 +16,7 @@
 
 Name:           docker
 Version:        1.11.1
-Release:        1
+Release:        2
 Summary:        Automates deployment of containerized applications
 License:        ASL 2.0
 Group:		System/Base
@@ -45,6 +45,9 @@ Requires:       xz
 Requires:       libcgroup
 Requires:	e2fsprogs
 Requires:	iptables
+
+Requires:	runc
+Requires:	containerd
 
 Obsoletes: docker-io < 1.2.0-8
 Provides: docker-io = %{version}-%{release}
