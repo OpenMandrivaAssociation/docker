@@ -157,6 +157,9 @@ This package installs %{summary}.
 #for f in `find . -name '*.go'`; do
 	#perl -pi -e 's|github.com/docker/docker/vendor/src/code.google.com/p/go/src/pkg/archive/tar|archive/tar|' $f
 #done
+%ifarch aarch64
+sed -i 's!-zmuldefs!-z muldefs!g' hack/make/binary
+%endif
 
 %build
 #export CC=gcc
