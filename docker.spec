@@ -15,8 +15,8 @@
 %define	shortcommit 4dc5990
 
 Name:           docker
-Version:        1.11.1
-Release:        4
+Version:        1.11.2
+Release:        1
 Summary:        Automates deployment of containerized applications
 License:        ASL 2.0
 Group:		System/Base
@@ -27,32 +27,31 @@ Source2:	docker.conf
 Patch0:		docker-1.11.0-dockeropts-service.patch
 # based on https://github.com/docker/docker/commit/3d6f5984f52802fe2f4af0dd2296c9e2e4a1e003
 Patch1:		docker-1.11.1-work-with-old-clients.patch
-BuildRequires:  glibc-static-devel
+BuildRequires:	glibc-static-devel
 
-BuildRequires:  golang
-BuildRequires:  pkgconfig(sqlite3)
+BuildRequires:	golang
+BuildRequires:	pkgconfig(sqlite3)
 
-BuildRequires:  go-md2man
-BuildRequires:  pkgconfig(systemd)
-BuildRequires:	pkgconfig(libsystemd-journal)
+BuildRequires:	go-md2man
+BuildRequires:	pkgconfig(systemd)
 BuildRequires:	pkgconfig(devmapper)
 BuildRequires:	btrfs-devel
-Requires:       systemd-units
+Requires:	systemd-units
 
 # need xz to work with ubuntu images
 # https://bugzilla.redhat.com/show_bug.cgi?id=1045220
-Requires:       xz
+Requires:	xz
 # https://bugzilla.redhat.com/show_bug.cgi?id=1034919
 # No longer needed in Fedora because of libcontainer
-Requires:       libcgroup
+Requires:	cgroup
 Requires:	e2fsprogs
 Requires:	iptables
 
 Requires:	runc
 Requires:	containerd
 
-Obsoletes: docker-io < 1.2.0-8
-Provides: docker-io = %{version}-%{release}
+Obsoletes:	docker-io < 1.2.0-8
+Provides:	docker-io = %{version}-%{release}
 
 %description
 Docker is an open-source engine that automates the deployment of any
