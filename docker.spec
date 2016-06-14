@@ -16,7 +16,7 @@
 
 Name:           docker
 Version:        1.11.2
-Release:        1
+Release:        2
 Summary:        Automates deployment of containerized applications
 License:        ASL 2.0
 Group:		System/Base
@@ -36,7 +36,7 @@ BuildRequires:	go-md2man
 BuildRequires:	pkgconfig(systemd)
 BuildRequires:	pkgconfig(devmapper)
 BuildRequires:	btrfs-devel
-Requires:	systemd-units
+Requires:	systemd
 
 # need xz to work with ubuntu images
 # https://bugzilla.redhat.com/show_bug.cgi?id=1045220
@@ -232,21 +232,17 @@ do
 	cp -rpav $dir %{buildroot}/%{gosrc}
 done
 
+install -d %{buildroot}%{_presetdir}
+cat > %{buildroot}%{_presetdir}/86-docker.preset << EOF
+enable docker.socket
+EOF
+
 find %{buildroot} -name "*~" -exec rm -rf {} \;
 find %{buildroot}%{go_dir}/src/github.com/ -type d -exec chmod 0755 {} \;
 
 %pre
 getent group docker > /dev/null || %{_sbindir}/groupadd -r docker
 exit 0
-
-%post
-%systemd_post docker
-
-%preun
-%systemd_preun docker
-
-%postun
-%systemd_postun_with_restart docker
 
 %files
 %doc AUTHORS CHANGELOG.md CONTRIBUTING.md LICENSE MAINTAINERS NOTICE README.md 
@@ -255,6 +251,7 @@ exit 0
 %{_mandir}/man5/Dockerfile.5.gz
 %{_bindir}/docker
 %config(noreplace) %{_sysconfdir}/sysconfig/docker
+%{_presetdir}/86-docker.preset
 %{_unitdir}/docker.service
 %{_unitdir}/docker.socket
 %dir %{_sysconfdir}/bash_completion.d
