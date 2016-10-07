@@ -16,7 +16,7 @@
 
 Name:           docker
 Version:        1.12.1
-Release:        1
+Release:        2
 Summary:        Automates deployment of containerized applications
 License:        ASL 2.0
 Group:		System/Base
@@ -24,7 +24,7 @@ URL:            http://www.docker.com
 Source0:        https://%{import_path}/archive/v%{version}.tar.gz
 Source1:	docker.rpmlintrc
 Source2:	docker.conf
-Patch0:		docker-var-cache.patch
+Patch0:		adjust-docker-service.patch
 BuildRequires:	glibc-static-devel
 
 BuildRequires:	golang
