@@ -15,8 +15,8 @@
 %define	shortcommit 4dc5990
 
 Name:           docker
-Version:        1.12.1
-Release:        2
+Version:        1.12.2
+Release:        1
 Summary:        Automates deployment of containerized applications
 License:        ASL 2.0
 Group:		System/Base
@@ -212,7 +212,7 @@ install -p -m 755 contrib/udev/80-docker.rules %{buildroot}%{_udevrulesdir}
 install -d -m 700 %{buildroot}%{_sharedstatedir}/docker
 # install systemd/init scripts
 install -d %{buildroot}%{_unitdir}
-install -p -m 644 contrib/init/systemd/docker.service %{buildroot}%{_unitdir}
+install -p -m 644 contrib/init/systemd/docker.service.rpm %{buildroot}%{_unitdir}/docker.service
 install -p -m 644 contrib/init/systemd/docker.socket %{buildroot}%{_unitdir}
 
 # sources

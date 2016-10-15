@@ -1,8 +1,8 @@
-diff --git a/contrib/init/systemd/docker.service b/contrib/init/systemd/docker.service
-index c3f3472..baa54ea 100644
---- a/contrib/init/systemd/docker.service
-+++ b/contrib/init/systemd/docker.service
-@@ -6,10 +6,11 @@ Requires=docker.socket
+diff --git a/contrib/init/systemd/docker.service.rpm b/contrib/init/systemd/docker.service.rpm
+index 08e90da..b6ff8c7 100644
+--- a/contrib/init/systemd/docker.service.rpm
++++ b/contrib/init/systemd/docker.service.rpm
+@@ -5,10 +5,11 @@ After=network.target
  
  [Service]
  Type=notify
@@ -10,8 +10,8 @@ index c3f3472..baa54ea 100644
  # the default is not to use systemd for cgroups because the delegate issues still
  # exists and systemd currently does not support the cgroup feature set required
  # for containers run by docker
--ExecStart=/usr/bin/dockerd -H fd://
-+ExecStart=/usr/bin/dockerd $DOCKER_OPTS -H fd:// -g /var/cache/docker
+-ExecStart=/usr/bin/dockerd
++ExecStart=/usr/bin/dockerd $DOCKER_OPTS -g /var/cache/docker
  ExecReload=/bin/kill -s HUP $MAINPID
  # Having non-zero Limit*s causes performance problems due to accounting overhead
  # in the kernel. We recommend using cgroups to do container-local accounting.
