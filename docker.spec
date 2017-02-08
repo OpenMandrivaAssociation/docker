@@ -150,17 +150,13 @@ This package installs %{summary}.
 %prep
 %setup -q -n docker-%{version}
 %apply_patches
-#rm -rf vendor/src/code.google.com vendor/src/github.com/{coreos,docker/libtrust,godbus,gorilla,kr,syndtr,tchap}
-#for f in `find . -name '*.go'`; do
-	#perl -pi -e 's|github.com/docker/docker/vendor/src/code.google.com/p/go/src/pkg/archive/tar|archive/tar|' $f
-#done
-%ifarch aarch64
-sed -i 's!-zmuldefs!-z muldefs!g' hack/make/.binary
-%endif
 
 %build
-#export CC=gcc
-#export CXX=g++
+%ifarch aarch64
+# weird stuff on clang here
+export CC=gcc
+export CXX=g++
+%endif
 #sed -i 's!external!internal!g' hack/make.sh
 #mkdir -p bfd
 #ln -s %{_bindir}/ld.bfd bfd/ld
