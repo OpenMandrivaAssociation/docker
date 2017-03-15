@@ -15,7 +15,7 @@
 %define	shortcommit 4dc5990
 
 Name:           docker
-Version:        1.12.6
+Version:        1.13.1
 Release:        1
 Summary:        Automates deployment of containerized applications
 License:        ASL 2.0
@@ -176,7 +176,6 @@ cp contrib/syntax/vim/README.md README-vim-syntax.md
 install -d %{buildroot}%{_bindir}
 install -p -m 755 bundles/%{version}/dynbinary-client/docker-%{version} %{buildroot}%{_bindir}/docker
 install -p -m 755 bundles/%{version}/dynbinary-daemon/dockerd-%{version} %{buildroot}%{_bindir}/dockerd
-install -p -m 755 bundles/%{version}/dynbinary-daemon/docker-proxy-%{version} %{buildroot}%{_bindir}/docker-proxy
 
 # Place to store images
 install -d %{buildroot}%{_libexecdir}/cache/docker
@@ -238,7 +237,6 @@ exit 0
 %{_mandir}/man1/docker*.1.gz
 %{_mandir}/man5/Dockerfile.5.gz
 %{_bindir}/docker
-%{_bindir}/docker-proxy
 %{_bindir}/dockerd
 %config(noreplace) %{_sysconfdir}/sysconfig/docker
 %{_presetdir}/86-docker.preset
