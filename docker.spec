@@ -148,7 +148,7 @@ Requires:	vim
 This package installs %{summary}.
 
 %prep
-%setup -q -n docker-%{version}
+%setup -q -n moby-%{version}
 %apply_patches
 
 %build
@@ -232,8 +232,6 @@ getent group docker > /dev/null || %{_sbindir}/groupadd -r docker
 exit 0
 
 %files
-%doc AUTHORS CHANGELOG.md CONTRIBUTING.md LICENSE MAINTAINERS NOTICE README.md 
-%doc LICENSE-vim-syntax README-vim-syntax.md
 %{_mandir}/man1/docker*.1.gz
 %{_mandir}/man5/Dockerfile.5.gz
 %{_bindir}/docker
@@ -250,6 +248,7 @@ exit 0
 %{_udevrulesdir}/80-docker.rules
 
 %files vim
+%doc LICENSE-vim-syntax README-vim-syntax.md
 %dir %{_datadir}/vim/vimfiles/doc
 %{_datadir}/vim/vimfiles/doc/dockerfile.txt
 %dir %{_datadir}/vim/vimfiles/ftdetect

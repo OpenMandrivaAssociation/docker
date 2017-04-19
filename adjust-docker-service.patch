@@ -3,7 +3,7 @@ index 08e90da..b6ff8c7 100644
 --- a/contrib/init/systemd/docker.service.rpm
 +++ b/contrib/init/systemd/docker.service.rpm
 @@ -5,10 +5,11 @@ After=network.target
- 
+
  [Service]
  Type=notify
 +EnvironmentFile=-/etc/sysconfig/docker
@@ -11,7 +11,7 @@ index 08e90da..b6ff8c7 100644
  # exists and systemd currently does not support the cgroup feature set required
  # for containers run by docker
 -ExecStart=/usr/bin/dockerd
-+ExecStart=/usr/bin/dockerd $DOCKER_OPTS -g /var/cache/docker
++ExecStart=/usr/bin/dockerd $DOCKER_OPTS -g /var/lib/docker
  ExecReload=/bin/kill -s HUP $MAINPID
  # Having non-zero Limit*s causes performance problems due to accounting overhead
  # in the kernel. We recommend using cgroups to do container-local accounting.
