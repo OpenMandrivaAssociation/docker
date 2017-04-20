@@ -15,13 +15,13 @@
 %define	shortcommit 4dc5990
 
 Name:           docker
-Version:        1.13.1
+Version:        17.03.1
 Release:        1
 Summary:        Automates deployment of containerized applications
 License:        ASL 2.0
 Group:		System/Base
 URL:            http://www.docker.com
-Source0:        https://%{import_path}/archive/v%{version}.tar.gz
+Source0:        https://%{import_path}/archive/v%{version}-ce.tar.gz
 Source1:	docker.rpmlintrc
 Source2:	docker.conf
 Patch0:		adjust-docker-service.patch
@@ -148,7 +148,7 @@ Requires:	vim
 This package installs %{summary}.
 
 %prep
-%setup -q -n moby-%{version}
+%setup -q -n moby-%{version}-ce
 %apply_patches
 
 %build
@@ -174,8 +174,8 @@ cp contrib/syntax/vim/README.md README-vim-syntax.md
 %install
 # install binary
 install -d %{buildroot}%{_bindir}
-install -p -m 755 bundles/%{version}/dynbinary-client/docker-%{version} %{buildroot}%{_bindir}/docker
-install -p -m 755 bundles/%{version}/dynbinary-daemon/dockerd-%{version} %{buildroot}%{_bindir}/dockerd
+install -p -m 755 bundles/%{version}-ce/dynbinary-client/docker-%{version}-ce %{buildroot}%{_bindir}/docker
+install -p -m 755 bundles/%{version}-ce/dynbinary-daemon/dockerd-%{version}-ce %{buildroot}%{_bindir}/dockerd
 
 # Place to store images
 install -d %{buildroot}%{_libexecdir}/cache/docker
