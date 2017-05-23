@@ -13,9 +13,13 @@
 %define provider_tld com
 %define project %{name}
 %define	shortcommit 4dc5990
+# needed for docker-proxy, is important part
+# git clone https://github.com/docker/libnetwork.git
+# git archive --format=tar --prefix libnetwork-$(date +%Y%m%d)/ HEAD | xz -vf > ../libnetwork-$(date +%Y%m%d).tar.xz
+%define libnetwork_date 20170523
 
 Name:           docker
-Version:        17.03.1
+Version:        17.05.0
 Release:        1
 Summary:        Automates deployment of containerized applications
 License:        ASL 2.0
@@ -24,6 +28,7 @@ URL:            http://www.docker.com
 Source0:        https://%{import_path}/archive/v%{version}-ce.tar.gz
 Source1:	docker.rpmlintrc
 Source2:	docker.conf
+Source3:	libnetwork-20170523.tar.xz
 Patch0:		adjust-docker-service.patch
 BuildRequires:	glibc-static-devel
 
@@ -151,6 +156,8 @@ This package installs %{summary}.
 %setup -q -n moby-%{version}-ce
 %apply_patches
 
+tar -xf %{SOURCE3} -C vendor/github.com/
+
 %build
 %ifarch aarch64
 # weird stuff on clang here
@@ -171,11 +178,17 @@ DEBUG=1 ./hack/make.sh dynbinary
 cp contrib/syntax/vim/LICENSE LICENSE-vim-syntax
 cp contrib/syntax/vim/README.md README-vim-syntax.md
 
+echo "build docker-proxy"
+export GOPATH=$(pwd)
+ln -s vendor src
+go build -ldflags='-linkmode=external' github.com/libnetwork/cmd/proxy
+
 %install
 # install binary
 install -d %{buildroot}%{_bindir}
 install -p -m 755 bundles/%{version}-ce/dynbinary-client/docker-%{version}-ce %{buildroot}%{_bindir}/docker
 install -p -m 755 bundles/%{version}-ce/dynbinary-daemon/dockerd-%{version}-ce %{buildroot}%{_bindir}/dockerd
+install -p -m 755 proxy %{buildroot}%{_bindir}/docker-proxy
 
 # Place to store images
 install -d %{buildroot}%{_libexecdir}/cache/docker
@@ -214,7 +227,7 @@ install -p -m 644 contrib/init/systemd/docker.socket %{buildroot}%{_unitdir}
 install -d -p %{buildroot}/%{gosrc}
 
 for dir in api daemon \
-           image opts pkg registry runconfig utils
+           image opts pkg registry runconfig
 do
 	cp -rpav $dir %{buildroot}/%{gosrc}
 done
@@ -235,6 +248,7 @@ exit 0
 %{_mandir}/man1/docker*.1.gz
 %{_mandir}/man5/Dockerfile.5.gz
 %{_bindir}/docker
+%{_bindir}/docker-proxy
 %{_bindir}/dockerd
 %config(noreplace) %{_sysconfdir}/sysconfig/docker
 %{_presetdir}/86-docker.preset
