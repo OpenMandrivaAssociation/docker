@@ -19,8 +19,9 @@
 %define libnetwork_date 20170523
 
 Name:           docker
-Version:        17.05.0
-Release:        4
+Version:        17.03.2
+Release:        1
+Epoch:		1
 Summary:        Automates deployment of containerized applications
 License:        ASL 2.0
 Group:		System/Base
