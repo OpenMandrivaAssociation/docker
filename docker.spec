@@ -15,7 +15,7 @@
 %define shortcommit c3959b1
 
 Name:           docker
-Version:        1.10.3
+Version:        1.12.6
 Release:        1
 Summary:        Automates deployment of containerized applications
 License:        ASL 2.0
@@ -247,7 +247,7 @@ exit 0
 %systemd_postun_with_restart docker
 
 %files
-%doc AUTHORS CHANGELOG.md CONTRIBUTING.md LICENSE MAINTAINERS NOTICE README.md 
+%doc AUTHORS CHANGELOG.md CONTRIBUTING.md LICENSE MAINTAINERS NOTICE README.md
 %doc LICENSE-vim-syntax README-vim-syntax.md
 %{_mandir}/man1/docker*.1.gz
 %{_mandir}/man5/Dockerfile.5.gz
