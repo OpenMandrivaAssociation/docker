@@ -1,0 +1,3 @@
+# /etc/sysconfig/docker-network
+# It's convenient to have docker listening on a tcp port so add it
+DOCKER_NETWORK_OPTIONS=-H unix://var/run/docker.sock -H tcp://127.0.0.1:2375
