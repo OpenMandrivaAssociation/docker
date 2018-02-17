@@ -30,7 +30,6 @@ Source0:        https://%{import_path}/archive/v%{moby_version}.tar.gz
 Source1: %{repo}.service
 Source2: %{repo}.sysconfig
 Source3: %{repo}-storage.sysconfig
-Source4: %{repo}-logrotate.sh
 Source6: %{repo}-network.sysconfig
 Source7: %{repo}.socket
 Source8: %{repo}-network-cleanup.sh
