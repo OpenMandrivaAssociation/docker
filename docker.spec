@@ -18,55 +18,46 @@
 %global commit      89658bed64c2a8fe05a978e5b87dbec409d57a0f
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 
-Name:           docker
-Version:        %{dist_version}
-Release:        1
-Summary:        Automates deployment of containerized applications
-License:        ASL 2.0
+Name:		docker
+Version:	%{dist_version}
+Release:	1
+Summary:	Automates deployment of containerized applications
+License:	ASL 2.0
 Epoch:		1
-
-URL:            http://www.docker.com
-Source0:        https://%{import_path}/archive/v%{moby_version}.tar.gz
-
-Source1: %{repo}.service
-Source2: %{repo}.sysconfig
-Source3: %{repo}-storage.sysconfig
-Source6: %{repo}-network.sysconfig
-Source7: %{repo}.socket
-Source8: %{repo}-network-cleanup.sh
-
-Source10:       https://%{provider}.%{provider_tld}/%{project}/libnetwork/archive/master.tar.gz
-
-BuildRequires:  gcc
-BuildRequires:  glibc-devel
-
+Group:		System/Configuration/Other
+URL:		http://www.docker.com
+Source0:	https://%{import_path}/archive/v%{moby_version}.tar.gz
+Source1:	%{repo}.service
+Source2:	%{repo}.sysconfig
+Source3:	%{repo}-storage.sysconfig
+Source6:	%{repo}-network.sysconfig
+Source7:	%{repo}.socket
+Source8:	%{repo}-network-cleanup.sh
+Source10:	https://%{provider}.%{provider_tld}/%{project}/libnetwork/archive/master.tar.gz
+BuildRequires:	gcc
+BuildRequires:	glibc-devel
+BuildRequires:	libltdl-devel
 # ensure build uses golang 1.4 or above
-BuildRequires:  golang >= 1.7
-
-BuildRequires:  pkgconfig(sqlite3)
-
-BuildRequires:  go-md2man
-BuildRequires:  pkgconfig(devmapper)
-BuildRequires:  btrfs-devel
-BuildRequires:  pkgconfig(systemd)
-Requires:       systemd-units
-
+BuildRequires:	golang >= 1.7
+BuildRequires:	pkgconfig(sqlite3)
+BuildRequires:	go-md2man
+BuildRequires:	pkgconfig(devmapper)
+BuildRequires:	btrfs-devel
+BuildRequires:	pkgconfig(systemd)
+Requires(pre):	rpm-helper
+Requires(post,preun,postun):	systemd
 # With docker >= 1.11 you now need containerd (and runC as a dep)
 Requires:	containerd >= 0.2.3
 Requires:	runc
-
 # need xz to work with ubuntu images
 # https://bugzilla.redhat.com/show_bug.cgi?id=1045220
-Requires:       xz
-
-Requires:       bridge-utils
-
+Requires:	xz
+Requires:	bridge-utils
 # https://bugzilla.redhat.com/show_bug.cgi?id=1034919
 # No longer needed in Fedora because of libcontainer
-Requires:       libcgroup
-Provides:       lxc-docker = %{version}
-
-Provides: docker-swarm = %{version}-%{release}
+Requires:	libcgroup
+Provides:	lxc-docker = %{version}
+Provides:	docker-swarm = %{version}-%{release}
 
 %description
 Docker is an open-source engine that automates the deployment of any
@@ -77,35 +68,36 @@ Docker containers can encapsulate any payload, and will run consistently on
 and between virtually any server. The same container that a developer builds
 and tests on a laptop will run at scale, in production*, on VMs, bare-metal
 servers, OpenStack clusters, public instances, or combinations of the above.
+
 %package fish-completion
-Summary: fish completion files for Docker
-Requires: %{repo} = %{version}-%{release}
-Requires: fish
-Provides: %{repo}-io-fish-completion = %{version}-%{release}
+Summary:	fish completion files for Docker
+Requires:	%{repo} = %{version}-%{release}
+Requires:	fish
+Provides:	%{repo}-io-fish-completion = %{version}-%{release}
 
 %description fish-completion
 This package installs %{summary}.
 
 %package unit-test
-Summary: %{summary} - for running unit tests
+Summary:	%{summary} - for running unit tests
 
 %description unit-test
-%{summary} - for running unit tests
+%{summary} - for running unit tests.
 
 %package vim
-Summary: vim syntax highlighting files for Docker
-Requires: %{repo} = %{version}-%{release}
-Requires: vim
-Provides: %{repo}-io-vim = %{version}-%{release}
+Summary:	vim syntax highlighting files for Docker
+Requires:	%{repo} = %{version}-%{release}
+Requires:	vim
+Provides:	%{repo}-io-vim = %{version}-%{release}
 
 %description vim
 This package installs %{summary}.
 
 %package zsh-completion
-Summary: zsh completion files for Docker
-Requires: %{repo} = %{version}-%{release}
-Requires: zsh
-Provides: %{repo}-io-zsh-completion = %{version}-%{release}
+Summary:	zsh completion files for Docker
+Requires:	%{repo} = %{version}-%{release}
+Requires:	zsh
+Provides:	%{repo}-io-zsh-completion = %{version}-%{release}
 
 %description zsh-completion
 This package installs %{summary}.
@@ -176,6 +168,11 @@ install -p -m 644 %{SOURCE3} %{buildroot}%{_sysconfdir}/sysconfig/%{repo}-storag
 install -d %{buildroot}%{_sbindir}
 install -p -m 755 %{SOURCE8} %{buildroot}%{_sbindir}/docker-network-cleanup
 
+install -d %{buildroot}%{_presetdir}
+cat > %{buildroot}%{_presetdir}/86-docker.preset << EOF
+enable docker.socket
+EOF
+
 %check
 # This is completely unstable so I desactivate it for now.
 #[ ! -w /run/%{repo}.sock ] || {
@@ -208,6 +205,7 @@ exit 0
 %{_bindir}/docker
 %{_sbindir}/docker-network-cleanup
 %{_sbindir}/dockerd
+%{_presetdir}/86-docker.preset
 %{_unitdir}/docker.service
 %{_unitdir}/docker.socket
 %dir %{_sysconfdir}/bash_completion.d
