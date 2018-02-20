@@ -1,6 +1,6 @@
 # modifying the dockerinit binary breaks the SHA1 sum check by docker
-%global dist_version 18.02.0
-%global moby_version %{dist_version}-ce
+%global dist_version 17.12.1
+%global moby_version %{dist_version}-ce-rc1
 
 # docker builds in a checksum of dockerinit into docker,
 # so stripping the binaries breaks docker
@@ -23,6 +23,7 @@ Version:        %{dist_version}
 Release:        1
 Summary:        Automates deployment of containerized applications
 License:        ASL 2.0
+Epoch:		1
 
 URL:            http://www.docker.com
 Source0:        https://%{import_path}/archive/v%{moby_version}.tar.gz
@@ -207,7 +208,6 @@ exit 0
 %{_bindir}/docker
 %{_sbindir}/docker-network-cleanup
 %{_sbindir}/dockerd
-%dir %{_var}/lib/docker
 %{_unitdir}/docker.service
 %{_unitdir}/docker.socket
 %dir %{_sysconfdir}/bash_completion.d
