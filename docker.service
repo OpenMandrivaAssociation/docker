@@ -15,10 +15,13 @@ ExecStart=/usr/sbin/dockerd \
           $DOCKER_STORAGE_OPTIONS \
           $DOCKER_NETWORK_OPTIONS \
           $INSECURE_REGISTRY
+TasksMax=8192
 LimitNOFILE=1048576
 LimitNPROC=1048576
 LimitCORE=infinity
 MountFlags=slave
+TimeoutStartSec=0
+Restart=on-abnormal
 ExecStartPre=/usr/sbin/docker-network-cleanup
 ExecStopPost=/usr/sbin/docker-network-cleanup
 
