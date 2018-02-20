@@ -44,6 +44,7 @@ BuildRequires:	go-md2man
 BuildRequires:	pkgconfig(devmapper)
 BuildRequires:	btrfs-devel
 BuildRequires:	pkgconfig(systemd)
+BuildRequires:	pkgconfig(libseccomp)
 Requires(pre):	rpm-helper
 Requires(post,preun,postun):	systemd
 # With docker >= 1.11 you now need containerd (and runC as a dep)
