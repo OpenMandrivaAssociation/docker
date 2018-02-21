@@ -124,7 +124,7 @@ popd
 %install
 # install binaries
 install -d %{buildroot}%{_bindir}
-install -p -m 755 components/cli/build/docker-linux-amd64 %{buildroot}%{_bindir}/docker
+install -p -m 755 components/cli/build/docker-linux-* %{buildroot}%{_bindir}/docker
 install -d %{buildroot}%{_sbindir}
 install -p -m 755 components/engine/bundles/dynbinary-daemon/dockerd-%{moby_version} %{buildroot}%{_sbindir}/dockerd
 
