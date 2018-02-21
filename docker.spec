@@ -44,6 +44,7 @@ BuildRequires:	go-md2man
 BuildRequires:	pkgconfig(devmapper)
 BuildRequires:	btrfs-devel
 BuildRequires:	pkgconfig(systemd)
+BuildRequires:	libtool-devel
 BuildRequires:	pkgconfig(libseccomp)
 Requires(pre):	rpm-helper
 Requires(post,preun,postun):	systemd
