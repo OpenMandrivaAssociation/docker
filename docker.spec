@@ -74,7 +74,6 @@ servers, OpenStack clusters, public instances, or combinations of the above.
 %package fish-completion
 Summary:	fish completion files for Docker
 Requires:	%{repo} = %{version}-%{release}
-Requires:	fish
 Provides:	%{repo}-io-fish-completion = %{version}-%{release}
 
 %description fish-completion
