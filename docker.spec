@@ -1,6 +1,6 @@
 # modifying the dockerinit binary breaks the SHA1 sum check by docker
 %global dist_version 17.12.1
-%global moby_version %{dist_version}-ce-rc1
+%global moby_version %{dist_version}-ce
 
 # docker builds in a checksum of dockerinit into docker,
 # so stripping the binaries breaks docker
@@ -33,7 +33,6 @@ Source3:	%{repo}-storage.sysconfig
 Source6:	%{repo}-network.sysconfig
 Source7:	%{repo}.socket
 Source8:	%{repo}-network-cleanup.sh
-Source10:	https://%{provider}.%{provider_tld}/%{project}/libnetwork/archive/master.tar.gz
 BuildRequires:	gcc
 BuildRequires:	glibc-devel
 BuildRequires:	libltdl-devel
