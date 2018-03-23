@@ -1,6 +1,6 @@
 # modifying the dockerinit binary breaks the SHA1 sum check by docker
 %global dist_version 17.12.1
-%global moby_version %{dist_version}-ce-rc1
+%global moby_version %{dist_version}-ce
 
 # docker builds in a checksum of dockerinit into docker,
 # so stripping the binaries breaks docker
@@ -20,7 +20,7 @@
 
 Name:		docker
 Version:	%{dist_version}
-Release:	1
+Release:	2
 Summary:	Automates deployment of containerized applications
 License:	ASL 2.0
 Epoch:		1
@@ -33,7 +33,7 @@ Source3:	%{repo}-storage.sysconfig
 Source6:	%{repo}-network.sysconfig
 Source7:	%{repo}.socket
 Source8:	%{repo}-network-cleanup.sh
-Source10:	https://%{provider}.%{provider_tld}/%{project}/libnetwork/archive/master.tar.gz
+Source9:	overlay.conf
 BuildRequires:	gcc
 BuildRequires:	glibc-devel
 BuildRequires:	libltdl-devel
@@ -174,6 +174,9 @@ cat > %{buildroot}%{_presetdir}/86-docker.preset << EOF
 enable docker.socket
 EOF
 
+install -d %{buildroot}%{_sysconfdir}/modules-load.d/
+install -p -m 644 %{SOURCE9} %{buildroot}%{_sysconfdir}/modules-load.d/overlay.conf
+
 %check
 # This is completely unstable so I desactivate it for now.
 #[ ! -w /run/%{repo}.sock ] || {
@@ -214,6 +217,7 @@ exit 0
 %dir %{_var}/lib/docker
 %dir %{_udevrulesdir}
 %{_udevrulesdir}/80-docker.rules
+%{_sysconfdir}/modules-load.d/overlay.conf
 
 %files fish-completion
 %dir %{_datadir}/fish/vendor_completions.d/
