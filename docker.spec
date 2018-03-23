@@ -20,7 +20,7 @@
 
 Name:		docker
 Version:	%{dist_version}
-Release:	1
+Release:	2
 Summary:	Automates deployment of containerized applications
 License:	ASL 2.0
 Epoch:		1
@@ -33,6 +33,7 @@ Source3:	%{repo}-storage.sysconfig
 Source6:	%{repo}-network.sysconfig
 Source7:	%{repo}.socket
 Source8:	%{repo}-network-cleanup.sh
+Source9:	overlay.conf
 BuildRequires:	gcc
 BuildRequires:	glibc-devel
 BuildRequires:	libltdl-devel
@@ -173,6 +174,9 @@ cat > %{buildroot}%{_presetdir}/86-docker.preset << EOF
 enable docker.socket
 EOF
 
+install -d %{buildroot}%{_sysconfdir}/modules-load.d/
+install -p -m 644 %{SOURCE9} %{buildroot}%{_sysconfdir}/modules-load.d/overlay.conf
+
 %check
 # This is completely unstable so I desactivate it for now.
 #[ ! -w /run/%{repo}.sock ] || {
@@ -213,6 +217,7 @@ exit 0
 %dir %{_var}/lib/docker
 %dir %{_udevrulesdir}
 %{_udevrulesdir}/80-docker.rules
+%{_sysconfdir}/modules-load.d/overlay.conf
 
 %files fish-completion
 %dir %{_datadir}/fish/vendor_completions.d/
