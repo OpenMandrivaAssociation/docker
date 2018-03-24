@@ -20,7 +20,7 @@
 
 Name:		docker
 Version:	%{dist_version}
-Release:	2
+Release:	3
 Summary:	Automates deployment of containerized applications
 License:	ASL 2.0
 Epoch:		1
