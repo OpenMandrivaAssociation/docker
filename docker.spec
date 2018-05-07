@@ -52,6 +52,7 @@ BuildRequires:	btrfs-devel
 BuildRequires:	pkgconfig(systemd)
 BuildRequires:	libtool-devel
 BuildRequires:	pkgconfig(libseccomp)
+BuildRequires:	cmake
 Requires(pre):	rpm-helper
 Requires(post,preun,postun):	systemd
 # With docker >= 1.11 you now need containerd (and runC as a dep)
