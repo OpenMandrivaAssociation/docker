@@ -42,6 +42,7 @@ Source10:       https://%{provider}.%{provider_tld}/%{project}/libnetwork/archiv
 Source11:	https://github.com/krallin/tini/archive/v%{tini_version}.tar.gz
 BuildRequires:	gcc
 BuildRequires:	glibc-devel
+BuildRequires:	glibc-static-devel
 BuildRequires:	libltdl-devel
 # ensure build uses golang 1.4 or above
 BuildRequires:	golang >= 1.7
