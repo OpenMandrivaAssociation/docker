@@ -79,36 +79,36 @@ and between virtually any server. The same container that a developer builds
 and tests on a laptop will run at scale, in production*, on VMs, bare-metal
 servers, OpenStack clusters, public instances, or combinations of the above.
 
-%package fish-completion
+%package	fish-completion
 Summary:	fish completion files for Docker
 Requires:	%{repo} = %{EVRD}
 Provides:	%{repo}-io-fish-completion = %{EVRD}
 
-%description fish-completion
+%description	fish-completion
 This package installs %{summary}.
 
-%package unit-test
+%package	unit-test
 Summary:	%{summary} - for running unit tests
 
-%description unit-test
+%description	unit-test
 %{summary} - for running unit tests.
 
-%package vim
+%package	vim
 Summary:	vim syntax highlighting files for Docker
-Requires:	%{repo} = %{version}-%{release}
+Requires:	%{repo} = %{EVRD}
 Requires:	vim
 Provides:	%{repo}-io-vim = %{EVRD}
 
-%description vim
+%description	vim
 This package installs %{summary}.
 
-%package zsh-completion
+%package	zsh-completion
 Summary:	zsh completion files for Docker
 Requires:	%{repo} = %{EVRD}
 Requires:	zsh
 Provides:	%{repo}-io-zsh-completion = %{EVRD}
 
-%description zsh-completion
+%description	zsh-completion
 This package installs %{summary}.
 
 %prep
@@ -159,7 +159,6 @@ fake_gopath_pushd tini github.com/krallin/tini
         %cmake
         %make tini-static
 fake_gopath_popd
-
 
 %install
 # install binaries
