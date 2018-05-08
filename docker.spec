@@ -2,6 +2,8 @@
 %global dist_version 18.03.1
 %global moby_version %{dist_version}-ce
 
+%global tini_version 0.18.0
+
 # docker builds in a checksum of dockerinit into docker,
 # so stripping the binaries breaks docker
 %global debug_package %{nil}
@@ -34,8 +36,13 @@ Source6:	%{repo}-network.sysconfig
 Source7:	%{repo}.socket
 Source8:	%{repo}-network-cleanup.sh
 Source9:	overlay.conf
+# docker-proxy
+Source10:       https://%{provider}.%{provider_tld}/%{project}/libnetwork/archive/master.tar.gz
+# tini
+Source11:	https://github.com/krallin/tini/archive/v%{tini_version}.tar.gz
 BuildRequires:	gcc
 BuildRequires:	glibc-devel
+BuildRequires:	glibc-static-devel
 BuildRequires:	libltdl-devel
 # ensure build uses golang 1.4 or above
 BuildRequires:	golang >= 1.7
@@ -47,6 +54,7 @@ BuildRequires:	pkgconfig(systemd)
 BuildRequires:	systemd
 BuildRequires:	libtool-devel
 BuildRequires:	pkgconfig(libseccomp)
+BuildRequires:	cmake
 Requires(pre):	rpm-helper
 Requires(post,preun,postun):	systemd
 # With docker >= 1.11 you now need containerd (and runC as a dep)
@@ -72,55 +80,86 @@ and between virtually any server. The same container that a developer builds
 and tests on a laptop will run at scale, in production*, on VMs, bare-metal
 servers, OpenStack clusters, public instances, or combinations of the above.
 
-%package fish-completion
+%package	fish-completion
 Summary:	fish completion files for Docker
-Requires:	%{repo} = %{version}-%{release}
-Provides:	%{repo}-io-fish-completion = %{version}-%{release}
+Requires:	%{repo} = %{EVRD}
+Provides:	%{repo}-io-fish-completion = %{EVRD}
 
-%description fish-completion
+%description	fish-completion
 This package installs %{summary}.
 
-%package unit-test
+%package	unit-test
 Summary:	%{summary} - for running unit tests
 
-%description unit-test
+%description	unit-test
 %{summary} - for running unit tests.
 
-%package vim
+%package	vim
 Summary:	vim syntax highlighting files for Docker
-Requires:	%{repo} = %{version}-%{release}
+Requires:	%{repo} = %{EVRD}
 Requires:	vim
-Provides:	%{repo}-io-vim = %{version}-%{release}
+Provides:	%{repo}-io-vim = %{EVRD}
 
-%description vim
+%description	vim
 This package installs %{summary}.
 
-%package zsh-completion
+%package	zsh-completion
 Summary:	zsh completion files for Docker
-Requires:	%{repo} = %{version}-%{release}
+Requires:	%{repo} = %{EVRD}
 Requires:	zsh
-Provides:	%{repo}-io-zsh-completion = %{version}-%{release}
+Provides:	%{repo}-io-zsh-completion = %{EVRD}
 
-%description zsh-completion
+%description	zsh-completion
 This package installs %{summary}.
 
 %prep
 %setup -q -n %{name}-ce-%{moby_version}
+tar xf %{SOURCE10}
+mv libnetwork-master libnetwork
+tar -xf %{SOURCE11}
+mv tini-%{tini_version} tini
 %apply_patches
 
 %build
+# magic again
+fake_gopath_pushd() {
+  mkdir -p "$(pwd)/src/${2%/*}"
+  rm -f "$(pwd)/src/$2"
+  ln -rsT "$1" "$(pwd)/src/$2"
+  pushd  "$(pwd)/src/$2" >/dev/null
+}
+
+fake_gopath_popd() {
+  popd >/dev/null
+}
+
 export DOCKER_GITCOMMIT="%{shortcommit}"
 mkdir -p src/github.com/docker
 export GOPATH=%{gopath}:$(pwd)
 # MAGIC HERE
 ln -s ../../../components/cli src/github.com/docker
 ln -s ../../../components/engine src/github.com/docker/docker
-pushd components/cli
-	DISABLE_WARN_OUTSIDE_CONTAINER=1 make VERSION=%{moby_version} dynbinary
-popd
+
+# dockerd
 pushd components/engine
 	DOCKER_BUILDTAGS='seccomp journald' VERSION=%{moby_version} hack/make.sh dynbinary
 popd
+
+# docker cli
+pushd components/cli
+	DISABLE_WARN_OUTSIDE_CONTAINER=1 make VERSION=%{moby_version} dynbinary
+popd
+
+### docker proxy
+fake_gopath_pushd libnetwork github.com/docker/libnetwork
+        go build -ldflags='-linkmode=external' github.com/docker/libnetwork/cmd/proxy
+fake_gopath_popd
+
+### docker-init
+fake_gopath_pushd tini github.com/krallin/tini
+        %cmake
+        %make tini-static
+fake_gopath_popd
 
 %install
 # install binaries
@@ -128,6 +167,8 @@ install -d %{buildroot}%{_bindir}
 install -p -m 755 components/cli/build/docker-linux-* %{buildroot}%{_bindir}/docker
 install -d %{buildroot}%{_sbindir}
 install -p -m 755 components/engine/bundles/dynbinary-daemon/dockerd-%{moby_version} %{buildroot}%{_sbindir}/dockerd
+install -p -m 755 libnetwork/proxy %{buildroot}%{_bindir}/docker-proxy
+install -p -m 755 tini/build/tini-static %{buildroot}%{_bindir}/docker-init
 
 # Place to store images
 install -d %{buildroot}%{_var}/lib/docker
@@ -208,6 +249,8 @@ exit 0
 %config(noreplace) %{_sysconfdir}/sysconfig/%{repo}-network
 %config(noreplace) %{_sysconfdir}/sysconfig/%{repo}-storage
 %{_bindir}/docker
+%{_bindir}/docker-proxy
+%{_bindir}/docker-init
 %{_sbindir}/docker-network-cleanup
 %{_sbindir}/dockerd
 %{_presetdir}/86-docker.preset
