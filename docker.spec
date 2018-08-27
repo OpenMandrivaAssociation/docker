@@ -1,5 +1,5 @@
 # modifying the dockerinit binary breaks the SHA1 sum check by docker
-%global dist_version 18.06.0
+%global dist_version 18.06.1
 %global moby_version %{dist_version}-ce
 
 %global tini_version 0.18.0
@@ -28,7 +28,7 @@ License:	ASL 2.0
 Epoch:		1
 Group:		System/Configuration/Other
 URL:		http://www.docker.com
-Source0:	https://%{import_path}/archive/v%{moby_version}.tar.gz
+Source0:	https://github.com/docker/docker-ce/archive/v%{dist_version}-ce.tar.gz
 Source1:	%{repo}.service
 Source2:	%{repo}.sysconfig
 Source3:	%{repo}-storage.sysconfig
