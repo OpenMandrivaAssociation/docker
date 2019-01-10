@@ -1,7 +1,6 @@
 # modifying the dockerinit binary breaks the SHA1 sum check by docker
 %global dist_version 18.09.1
 %global moby_version %{dist_version}
-%define beta rc1
 
 %global tini_version 0.18.0
 
@@ -23,13 +22,13 @@
 
 Name:		docker
 Version:	%{dist_version}
-Release:	%{?beta:0.%{beta}.}1
+Release:	1
 Summary:	Automates deployment of containerized applications
 License:	ASL 2.0
 Epoch:		1
 Group:		System/Configuration/Other
 URL:		http://www.docker.com
-Source0:	https://github.com/docker/docker-ce/archive/v%{dist_version}%{?beta:-%{beta}}.tar.gz
+Source0:	https://github.com/docker/docker-ce/archive/v%{dist_version}.tar.gz
 Source1:	%{repo}.service
 Source2:	%{repo}.sysconfig
 Source3:	%{repo}-storage.sysconfig
@@ -114,7 +113,7 @@ Provides:	%{repo}-io-zsh-completion = %{EVRD}
 This package installs %{summary}.
 
 %prep
-%setup -q -n %{name}-ce-%{moby_version}%{?beta:-%{beta}}
+%setup -q -n %{name}-ce-%{moby_version}
 tar xf %{SOURCE10}
 mv libnetwork-master libnetwork
 tar -xf %{SOURCE11}
