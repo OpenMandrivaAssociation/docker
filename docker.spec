@@ -1,5 +1,5 @@
 # modifying the dockerinit binary breaks the SHA1 sum check by docker
-%global dist_version 18.09.1
+%global dist_version 18.09.2
 %global moby_version %{dist_version}
 
 %global tini_version 0.18.0
