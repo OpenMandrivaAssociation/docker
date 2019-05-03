@@ -1,5 +1,5 @@
 # modifying the dockerinit binary breaks the SHA1 sum check by docker
-%global dist_version 18.09.3
+%global dist_version 18.09.5
 %global moby_version %{dist_version}
 
 %global tini_version 0.18.0
@@ -22,7 +22,7 @@
 
 Name:		docker
 Version:	%{dist_version}
-Release:	1
+Release:	2
 Summary:	Automates deployment of containerized applications
 License:	ASL 2.0
 Epoch:		1
@@ -66,7 +66,6 @@ Requires:	xz
 Requires:	bridge-utils
 # https://bugzilla.redhat.com/show_bug.cgi?id=1034919
 # No longer needed in Fedora because of libcontainer
-Requires:	libcgroup
 Provides:	lxc-docker = %{version}
 Provides:	docker-swarm = %{version}-%{release}
 
