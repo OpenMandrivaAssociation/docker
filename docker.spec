@@ -1,5 +1,5 @@
 # modifying the dockerinit binary breaks the SHA1 sum check by docker
-%global dist_version 18.09.6
+%global dist_version 18.09.7
 %global moby_version %{dist_version}
 
 %global tini_version 0.18.0
@@ -22,7 +22,7 @@
 
 Name:		docker
 Version:	%{dist_version}
-Release:	2
+Release:	1
 Summary:	Automates deployment of containerized applications
 License:	ASL 2.0
 Epoch:		1
