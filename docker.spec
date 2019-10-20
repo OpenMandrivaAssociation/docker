@@ -21,7 +21,7 @@
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 
 Name:		docker
-Version:	%{dist_version}
+Version:	19.03.4
 Release:	1
 Summary:	Automates deployment of containerized applications
 License:	ASL 2.0
