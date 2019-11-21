@@ -1,6 +1,4 @@
 # modifying the dockerinit binary breaks the SHA1 sum check by docker
-%global dist_version 19.03.2
-%global moby_version %{dist_version}
 
 %global tini_version 0.18.0
 
@@ -21,14 +19,15 @@
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 
 Name:		docker
-Version:	19.03.4
+Version:	19.03.5
+%global moby_version %{version}
 Release:	1
 Summary:	Automates deployment of containerized applications
 License:	ASL 2.0
 Epoch:		1
 Group:		System/Configuration/Other
 URL:		http://www.docker.com
-Source0:	https://github.com/docker/docker-ce/archive/v%{dist_version}.tar.gz
+Source0:	https://github.com/docker/docker-ce/archive/v%{version}.tar.gz
 Source1:	%{repo}.service
 Source2:	%{repo}.sysconfig
 Source3:	%{repo}-storage.sysconfig
