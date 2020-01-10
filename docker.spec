@@ -116,7 +116,7 @@ tar xf %{SOURCE10}
 mv libnetwork-master libnetwork
 tar -xf %{SOURCE11}
 mv tini-%{tini_version} tini
-%apply_patches
+%autopatch -p1
 
 %build
 # magic again
