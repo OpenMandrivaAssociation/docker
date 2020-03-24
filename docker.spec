@@ -19,7 +19,7 @@
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 
 Name:		docker
-Version:	19.03.7
+Version:	19.03.8
 %global moby_version %{version}
 Release:	1
 Summary:	Automates deployment of containerized applications
