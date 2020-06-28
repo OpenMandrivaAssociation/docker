@@ -18,8 +18,10 @@
 %global commit      89658bed64c2a8fe05a978e5b87dbec409d57a0f
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 
+%global build_ldflags %{build_ldflags} --rtlib=libgcc --unwindlib=libgcc
+
 Name:		docker
-Version:	19.03.8
+Version:	19.03.12
 %global moby_version %{version}
 Release:	1
 Summary:	Automates deployment of containerized applications
@@ -56,9 +58,9 @@ BuildRequires:	pkgconfig(libseccomp)
 BuildRequires:	cmake
 Requires(pre):	rpm-helper
 Requires(post,preun,postun):	systemd
-# With docker >= 1.11 you now need containerd (and runC as a dep)
+# With docker >= 1.11 you now need containerd (and runC or crun as a dep)
 Requires:	containerd >= 0.2.3
-Requires:	runc
+Requires:	crun
 # need xz to work with ubuntu images
 # https://bugzilla.redhat.com/show_bug.cgi?id=1045220
 Requires:	xz
@@ -171,6 +173,20 @@ install -p -m 755 tini/build/tini-static %{buildroot}%{_bindir}/docker-init
 # Place to store images
 install -d %{buildroot}%{_var}/lib/docker
 
+%if 0
+# teach it about crun
+install -d %{buildroot}%{_sysconfdir}/docker
+cat >%{buildroot}%{_sysconfdir}/docker/daemon.json <<'EOF'
+{
+	"runtimes": {
+		"crun": {
+			"path": "%{_bindir}/crun"
+		}
+	}
+}
+EOF
+%endif
+
 # install bash completion
 install -d %{buildroot}%{_sysconfdir}/bash_completion.d
 install -p -m 644 components/cli/contrib/completion/bash/docker %{buildroot}%{_sysconfdir}/bash_completion.d/docker.bash
@@ -246,6 +262,10 @@ exit 0
 %config(noreplace) %{_sysconfdir}/sysconfig/%{repo}
 %config(noreplace) %{_sysconfdir}/sysconfig/%{repo}-network
 %config(noreplace) %{_sysconfdir}/sysconfig/%{repo}-storage
+%if 0
+%dir %{_sysconfdir}/docker
+%config(noreplace) %{_sysconfdir}/docker/daemon.json
+%endif
 %{_bindir}/docker
 %{_bindir}/docker-proxy
 %{_bindir}/docker-init
