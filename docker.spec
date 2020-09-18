@@ -1,6 +1,7 @@
 # modifying the dockerinit binary breaks the SHA1 sum check by docker
 
 %global tini_version 0.18.0
+%global buildx_version 0.4.2
 
 # docker builds in a checksum of dockerinit into docker,
 # so stripping the binaries breaks docker
@@ -21,7 +22,7 @@
 %global build_ldflags %{build_ldflags} --rtlib=libgcc --unwindlib=libgcc
 
 Name:		docker
-Version:	19.03.12
+Version:	19.03.13
 %global moby_version %{version}
 Release:	1
 Summary:	Automates deployment of containerized applications
@@ -41,6 +42,8 @@ Source9:	overlay.conf
 Source10:       https://%{provider}.%{provider_tld}/%{project}/libnetwork/archive/master.tar.gz
 # tini
 Source11:	https://github.com/krallin/tini/archive/v%{tini_version}.tar.gz
+# buildx
+Source12:	https://github.com/docker/buildx/archive/v%{buildx_version}/buildx-%{buildx_version}.tar.gz
 BuildRequires:	gcc
 BuildRequires:	glibc-devel
 BuildRequires:	glibc-static-devel
@@ -116,8 +119,10 @@ This package installs %{summary}.
 %setup -q -n %{name}-ce-%{moby_version}
 tar xf %{SOURCE10}
 mv libnetwork-master libnetwork
-tar -xf %{SOURCE11}
+tar xf %{SOURCE11}
 mv tini-%{tini_version} tini
+tar xf %{SOURCE12}
+mv buildx-%{buildx_version} buildx
 %autopatch -p1
 
 %build
