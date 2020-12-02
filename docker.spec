@@ -22,7 +22,7 @@
 %global build_ldflags %{build_ldflags} --rtlib=libgcc --unwindlib=libgcc
 
 Name:		docker
-Version:	19.03.13
+Version:	19.03.14
 %global moby_version %{version}
 Release:	1
 Summary:	Automates deployment of containerized applications
