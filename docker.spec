@@ -1,28 +1,26 @@
 # modifying the dockerinit binary breaks the SHA1 sum check by docker
 
-%global tini_version 0.18.0
+%global tini_version 0.19.0
 %global buildx_version 0.4.2
 
 # docker builds in a checksum of dockerinit into docker,
 # so stripping the binaries breaks docker
 %global debug_package %{nil}
-%global provider github
-%global provider_tld com
 %global project docker
 %global repo %{project}
-%global import_path %{provider}.%{provider_tld}/%{project}/%{repo}
+%global import_path github.com/%{project}/%{repo}
 
 #debuginfo not supported with Go
 %global gopath  %{_libdir}/golang
 %define gosrc %{gopath}/src/pkg/%{import_path}
 
-%global commit      89658bed64c2a8fe05a978e5b87dbec409d57a0f
+%global commit      f0014860c1b3345e1fcc7ed81c491298de2633fb
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 
 %global build_ldflags %{build_ldflags} --rtlib=libgcc --unwindlib=libgcc
 
 Name:		docker
-Version:	19.03.14
+Version:	20.10.1
 %global moby_version %{version}
 Release:	1
 Summary:	Automates deployment of containerized applications
@@ -30,7 +28,7 @@ License:	ASL 2.0
 Epoch:		1
 Group:		System/Configuration/Other
 URL:		http://www.docker.com
-Source0:	https://github.com/docker/docker-ce/archive/v%{version}.tar.gz
+Source0:	https://github.com/moby/moby/archive/v%{version}/moby-%{version}.tar.gz
 Source1:	%{repo}.service
 Source2:	%{repo}.sysconfig
 Source3:	%{repo}-storage.sysconfig
@@ -39,11 +37,13 @@ Source7:	%{repo}.socket
 Source8:	%{repo}-network-cleanup.sh
 Source9:	overlay.conf
 # docker-proxy
-Source10:       https://%{provider}.%{provider_tld}/%{project}/libnetwork/archive/master.tar.gz
+Source10:       https://github.com/%{project}/libnetwork/archive/master/libnetwork-master.tar.gz
 # tini
-Source11:	https://github.com/krallin/tini/archive/v%{tini_version}.tar.gz
+Source11:	https://github.com/krallin/tini/archive/v%{tini_version}/tini-%{tini_version}.tar.gz
+# cli
+Source12:	https://github.com/docker/cli/archive/v%{version}/cli-%{version}.tar.gz
 # buildx
-Source12:	https://github.com/docker/buildx/archive/v%{buildx_version}/buildx-%{buildx_version}.tar.gz
+Source13:	https://github.com/docker/buildx/archive/v%{buildx_version}/buildx-%{buildx_version}.tar.gz
 BuildRequires:	gcc
 BuildRequires:	glibc-devel
 BuildRequires:	glibc-static-devel
@@ -116,62 +116,50 @@ Provides:	%{repo}-io-zsh-completion = %{EVRD}
 This package installs %{summary}.
 
 %prep
-%setup -q -n %{name}-ce-%{moby_version}
+%autosetup -p1 -n moby-%{version}
 tar xf %{SOURCE10}
 mv libnetwork-master libnetwork
 tar xf %{SOURCE11}
 mv tini-%{tini_version} tini
 tar xf %{SOURCE12}
-mv buildx-%{buildx_version} buildx
-%autopatch -p1
+#tar xf %{SOURCE13}
+#mv buildx-%{buildx_version} buildx
 
 %build
-# magic again
-fake_gopath_pushd() {
-  mkdir -p "$(pwd)/src/${2%/*}"
-  rm -f "$(pwd)/src/$2"
-  ln -rsT "$1" "$(pwd)/src/$2"
-  pushd  "$(pwd)/src/$2" >/dev/null
-}
-
-fake_gopath_popd() {
-  popd >/dev/null
-}
-
+mkdir -p GO/src/github.com/{docker,krallin}
+ln -s `pwd`/cli-%{version} GO/src/github.com/docker/cli
+ln -s `pwd`/libnetwork GO/src/github.com/docker/libnetwork
+ln -s `pwd`/tini GO/src/github.com/krallin/tini
+ln -s `pwd` GO/src/github.com/docker/docker
 export DOCKER_GITCOMMIT="%{shortcommit}"
-mkdir -p src/github.com/docker
-export GOPATH=%{gopath}:$(pwd)
-# MAGIC HERE
-ln -s ../../../components/cli src/github.com/docker
-ln -s ../../../components/engine src/github.com/docker/docker
+export TMP_GOPATH="`pwd`/GO"
+export GOPATH=%{gopath}:"`pwd`/GO"
+
+# docker-init
+cd tini
+	%cmake
+	%make_build tini-static
+cd ../..
 
 # dockerd
-pushd components/engine
-	DOCKER_BUILDTAGS='seccomp journald' VERSION=%{moby_version} hack/make.sh dynbinary
-popd
+DOCKER_BUILDTAGS='seccomp journald' VERSION=%{moby_version} hack/make.sh dynbinary
 
-# docker cli
-pushd components/cli
-	DISABLE_WARN_OUTSIDE_CONTAINER=1 make VERSION=%{moby_version} dynbinary
-popd
-
-### docker proxy
-fake_gopath_pushd libnetwork github.com/docker/libnetwork
+# docker-proxy
+cd libnetwork
         go build -ldflags='-linkmode=external' github.com/docker/libnetwork/cmd/proxy
-fake_gopath_popd
+cd ..
 
-### docker-init
-fake_gopath_pushd tini github.com/krallin/tini
-        %cmake
-        %make tini-static
-fake_gopath_popd
+# cli
+cd cli-%{version}
+	DISABLE_WARN_OUTSIDE_CONTAINER=1 make VERSION=%{moby_version} LDFLAGS="-linkmode=external" dynbinary
+cd ..
 
 %install
 # install binaries
 install -d %{buildroot}%{_bindir}
-install -p -m 755 components/cli/build/docker-linux-* %{buildroot}%{_bindir}/docker
+install -p -m 755 cli-%{version}/build/docker-linux-* %{buildroot}%{_bindir}/docker
 install -d %{buildroot}%{_sbindir}
-install -p -m 755 components/engine/bundles/dynbinary-daemon/dockerd-%{moby_version} %{buildroot}%{_sbindir}/dockerd
+install -p -m 755 bundles/dynbinary-daemon/dockerd-%{moby_version} %{buildroot}%{_sbindir}/dockerd
 install -p -m 755 libnetwork/proxy %{buildroot}%{_bindir}/docker-proxy
 install -p -m 755 tini/build/tini-static %{buildroot}%{_bindir}/docker-init
 
@@ -194,26 +182,21 @@ EOF
 
 # install bash completion
 install -d %{buildroot}%{_sysconfdir}/bash_completion.d
-install -p -m 644 components/cli/contrib/completion/bash/docker %{buildroot}%{_sysconfdir}/bash_completion.d/docker.bash
+install -p -m 644 cli-%{version}/contrib/completion/bash/docker %{buildroot}%{_sysconfdir}/bash_completion.d/docker.bash
+
+# install zsh completion
+install -d %{buildroot}%{_datadir}/zsh/site-functions
+install -p -m 644 cli-%{version}/contrib/completion/zsh/_docker %{buildroot}%{_datadir}/zsh/site-functions
 
 # install fish completion
 # create, install and own /usr/share/fish/vendor_completions.d until
 # upstream fish provides it
 install -dp %{buildroot}%{_datadir}/fish/vendor_completions.d
-install -p -m 644 components/cli/contrib/completion/fish/%{repo}.fish %{buildroot}%{_datadir}/fish/vendor_completions.d
-
-# install vim syntax highlighting
-install -d %{buildroot}%{_datadir}/vim/vimfiles/{doc,ftdetect,syntax}
-install -p -m 644 components/engine/contrib/syntax/vim/ftdetect/dockerfile.vim %{buildroot}%{_datadir}/vim/vimfiles/ftdetect
-install -p -m 644 components/engine/contrib/syntax/vim/syntax/dockerfile.vim %{buildroot}%{_datadir}/vim/vimfiles/syntax
-
-# install zsh completion
-install -d %{buildroot}%{_datadir}/zsh/site-functions
-install -p -m 644 components/cli/contrib/completion/zsh/_docker %{buildroot}%{_datadir}/zsh/site-functions
+install -p -m 644 cli-%{version}/contrib/completion/fish/%{repo}.fish %{buildroot}%{_datadir}/fish/vendor_completions.d
 
 # install udev rules
 install -d %{buildroot}%{_udevrulesdir}
-install -p -m 644 components/engine/contrib/udev/80-docker.rules %{buildroot}%{_udevrulesdir}
+install -p -m 644 contrib/udev/80-docker.rules %{buildroot}%{_udevrulesdir}
 # install storage dir
 install -d -m 700 %{buildroot}%{_var}/lib/docker
 # install systemd/init scripts
@@ -289,10 +272,6 @@ exit 0
 %files fish-completion
 %dir %{_datadir}/fish/vendor_completions.d/
 %{_datadir}/fish/vendor_completions.d/%{repo}.fish
-
-%files vim
-%{_datadir}/vim/vimfiles/ftdetect/%{repo}file.vim
-%{_datadir}/vim/vimfiles/syntax/%{repo}file.vim
 
 %files zsh-completion
 %{_datadir}/zsh/site-functions/_%{repo}
