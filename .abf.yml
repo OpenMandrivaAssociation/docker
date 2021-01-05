@@ -1,6 +1,6 @@
 sources:
   buildx-0.4.2.tar.gz: 0f595a9146b0fd59c167325f5e9d4a0488e63ad9
-  cli-20.10.1.tar.gz: 475dfcec26cb528894c91c43fba95ec4eb4b3bb6
   libnetwork-master.tar.gz: 78f0f878cf779daea298b0735c9d2b48303a4cb5
-  moby-20.10.1.tar.gz: b8501d92996112028df29284021240aa42e7fbeb
   tini-0.19.0.tar.gz: 2245210bdd29faea02e566a192df4c7df702b264
+  cli-20.10.2.tar.gz: 6df6c071a7ef13470c1859b4b2302e1c7b055566
+  moby-20.10.2.tar.gz: b873d73e33459dfb76968bf5c8b058a1d4130f54

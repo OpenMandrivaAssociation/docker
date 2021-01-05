@@ -20,7 +20,7 @@
 %global build_ldflags %{build_ldflags} --rtlib=libgcc --unwindlib=libgcc
 
 Name:		docker
-Version:	20.10.1
+Version:	20.10.2
 %global moby_version %{version}
 Release:	1
 Summary:	Automates deployment of containerized applications
