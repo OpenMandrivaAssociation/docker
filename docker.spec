@@ -22,7 +22,7 @@
 Name:		docker
 Version:	20.10.2
 %global moby_version %{version}
-Release:	1
+Release:	2
 Summary:	Automates deployment of containerized applications
 License:	ASL 2.0
 Epoch:		1

@@ -2,7 +2,7 @@
 
 # Modify these options if you want to change the way the docker daemon runs
 #OPTIONS='--default-runtime=crun'
-OPTIONS=''
+OPTIONS='--log-opt max-size=10m --log-opt max-file=3'
 DOCKER_CERT_PATH=/etc/docker
 
 # Enable insecure registry communication by appending the registry URL
