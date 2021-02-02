@@ -1,7 +1,7 @@
 # modifying the dockerinit binary breaks the SHA1 sum check by docker
 
 %global tini_version 0.19.0
-%global buildx_version 0.4.2
+%global buildx_version 0.5.1
 
 # docker builds in a checksum of dockerinit into docker,
 # so stripping the binaries breaks docker
@@ -20,9 +20,9 @@
 %global build_ldflags %{build_ldflags} --rtlib=libgcc --unwindlib=libgcc
 
 Name:		docker
-Version:	20.10.2
+Version:	20.10.3
 %global moby_version %{version}
-Release:	2
+Release:	1
 Summary:	Automates deployment of containerized applications
 License:	ASL 2.0
 Epoch:		1
@@ -122,8 +122,8 @@ mv libnetwork-master libnetwork
 tar xf %{SOURCE11}
 mv tini-%{tini_version} tini
 tar xf %{SOURCE12}
-#tar xf %{SOURCE13}
-#mv buildx-%{buildx_version} buildx
+tar xf %{SOURCE13}
+mv buildx-%{buildx_version} buildx
 
 %build
 mkdir -p GO/src/github.com/{docker,krallin}
@@ -132,6 +132,7 @@ ln -s `pwd`/libnetwork GO/src/github.com/docker/libnetwork
 ln -s `pwd`/tini GO/src/github.com/krallin/tini
 ln -s `pwd` GO/src/github.com/docker/docker
 export DOCKER_GITCOMMIT="%{shortcommit}"
+export DOCKER_CLI_EXPERIMENTAL=enabled
 export TMP_GOPATH="`pwd`/GO"
 export GOPATH=%{gopath}:"`pwd`/GO"
 
@@ -221,8 +222,8 @@ EOF
 install -d %{buildroot}%{_sysconfdir}/modules-load.d/
 install -p -m 644 %{SOURCE9} %{buildroot}%{_sysconfdir}/modules-load.d/overlay.conf
 
-%check
-# This is completely unstable so I desactivate it for now.
+#%%check
+# This is completely unstable so I deactivate it for now.
 #[ ! -w /run/%{repo}.sock ] || {
     #mkdir test_dir
     #pushd test_dir
