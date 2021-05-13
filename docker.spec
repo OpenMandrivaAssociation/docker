@@ -3,9 +3,6 @@
 %global tini_version 0.19.0
 %global buildx_version 0.5.1
 
-# docker builds in a checksum of dockerinit into docker,
-# so stripping the binaries breaks docker
-%global debug_package %{nil}
 %global project docker
 %global repo %{project}
 %global import_path github.com/%{project}/%{repo}
@@ -19,11 +16,11 @@
 
 %global build_ldflags %{build_ldflags} --rtlib=libgcc --unwindlib=libgcc
 
+Summary:	Automates deployment of containerized applications
 Name:		docker
 Version:	20.10.6
 %global moby_version %{version}
-Release:	1
-Summary:	Automates deployment of containerized applications
+Release:	2
 License:	ASL 2.0
 Epoch:		1
 Group:		System/Configuration/Other
@@ -32,12 +29,13 @@ Source0:	https://github.com/moby/moby/archive/v%{version}/moby-%{version}.tar.gz
 Source1:	%{repo}.service
 Source2:	%{repo}.sysconfig
 Source3:	%{repo}-storage.sysconfig
+Source4:	docker.sysusers
 Source6:	%{repo}-network.sysconfig
 Source7:	%{repo}.socket
 Source8:	%{repo}-network-cleanup.sh
 Source9:	overlay.conf
 # docker-proxy
-Source10:       https://github.com/%{project}/libnetwork/archive/master/libnetwork-master.tar.gz
+Source10:	https://github.com/%{project}/libnetwork/archive/master/libnetwork-master.tar.gz
 # tini
 Source11:	https://github.com/krallin/tini/archive/v%{tini_version}/tini-%{tini_version}.tar.gz
 # cli
@@ -59,8 +57,8 @@ BuildRequires:	systemd
 BuildRequires:	libtool-devel
 BuildRequires:	pkgconfig(libseccomp)
 BuildRequires:	cmake
-Requires(pre):	rpm-helper
-Requires(post,preun,postun):	systemd
+Requires(pre):	systemd
+%systemd_requires
 # With docker >= 1.11 you now need containerd (and runC or crun as a dep)
 Requires:	containerd >= 0.2.3
 Requires:	crun
@@ -83,30 +81,30 @@ and between virtually any server. The same container that a developer builds
 and tests on a laptop will run at scale, in production*, on VMs, bare-metal
 servers, OpenStack clusters, public instances, or combinations of the above.
 
-%package	fish-completion
+%package fish-completion
 Summary:	fish completion files for Docker
 Requires:	%{repo} = %{EVRD}
 Provides:	%{repo}-io-fish-completion = %{EVRD}
 
-%description	fish-completion
+%description fish-completion
 This package installs %{summary}.
 
-%package	unit-test
+%package unit-test
 Summary:	%{summary} - for running unit tests
 
-%description	unit-test
+%description unit-test
 %{summary} - for running unit tests.
 
-%package	vim
+%package vim
 Summary:	vim syntax highlighting files for Docker
 Requires:	%{repo} = %{EVRD}
 Requires:	vim
 Provides:	%{repo}-io-vim = %{EVRD}
 
-%description	vim
+%description vim
 This package installs %{summary}.
 
-%package	zsh-completion
+%package zsh-completion
 Summary:	zsh completion files for Docker
 Requires:	%{repo} = %{EVRD}
 Requires:	zsh
@@ -127,19 +125,19 @@ mv buildx-%{buildx_version} buildx
 
 %build
 mkdir -p GO/src/github.com/{docker,krallin}
-ln -s `pwd`/cli-%{version} GO/src/github.com/docker/cli
-ln -s `pwd`/libnetwork GO/src/github.com/docker/libnetwork
-ln -s `pwd`/tini GO/src/github.com/krallin/tini
-ln -s `pwd` GO/src/github.com/docker/docker
+ln -s $(pwd)/cli-%{version} GO/src/github.com/docker/cli
+ln -s $(pwd)/libnetwork GO/src/github.com/docker/libnetwork
+ln -s $(pwd)/tini GO/src/github.com/krallin/tini
+ln -s $(pwd) GO/src/github.com/docker/docker
 export DOCKER_GITCOMMIT="%{shortcommit}"
 export DOCKER_CLI_EXPERIMENTAL=enabled
-export TMP_GOPATH="`pwd`/GO"
-export GOPATH=%{gopath}:"`pwd`/GO"
+export TMP_GOPATH="$(pwd)/GO"
+export GOPATH=%{gopath}:"$(pwd)/GO"
 
 # docker-init
 cd tini
-	%cmake
-	%make_build tini-static
+    %cmake
+    %make_build tini-static
 cd ../..
 
 # dockerd
@@ -147,12 +145,12 @@ DOCKER_BUILDTAGS='seccomp journald' VERSION=%{moby_version} hack/make.sh dynbina
 
 # docker-proxy
 cd libnetwork
-        go build -ldflags='-linkmode=external' github.com/docker/libnetwork/cmd/proxy
+    go build -ldflags='-linkmode=external' github.com/docker/libnetwork/cmd/proxy
 cd ..
 
 # cli
 cd cli-%{version}
-	DISABLE_WARN_OUTSIDE_CONTAINER=1 make VERSION=%{moby_version} LDFLAGS="-linkmode=external" dynbinary
+    DISABLE_WARN_OUTSIDE_CONTAINER=1 make VERSION=%{moby_version} LDFLAGS="-linkmode=external" dynbinary
 cd ..
 
 %install
@@ -222,6 +220,8 @@ EOF
 install -d %{buildroot}%{_sysconfdir}/modules-load.d/
 install -p -m 644 %{SOURCE9} %{buildroot}%{_sysconfdir}/modules-load.d/overlay.conf
 
+install -Dpm 644 %{SOURCE4} %{buildroot}%{_sysusersdir}/%{name}.conf
+
 #%%check
 # This is completely unstable so I deactivate it for now.
 #[ ! -w /run/%{repo}.sock ] || {
@@ -235,8 +235,7 @@ install -p -m 644 %{SOURCE9} %{buildroot}%{_sysconfdir}/modules-load.d/overlay.c
 #}
 
 %pre
-getent group docker > /dev/null || %{_sbindir}/groupadd -r docker
-exit 0
+%sysusers_create_package docker.conf %{SOURCE4}
 
 %post
 %systemd_post docker
@@ -251,6 +250,7 @@ exit 0
 %config(noreplace) %{_sysconfdir}/sysconfig/%{repo}
 %config(noreplace) %{_sysconfdir}/sysconfig/%{repo}-network
 %config(noreplace) %{_sysconfdir}/sysconfig/%{repo}-storage
+%{_sysusersdir}/%{name}.conf
 %if 0
 %dir %{_sysconfdir}/docker
 %config(noreplace) %{_sysconfdir}/docker/daemon.json
