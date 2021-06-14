@@ -20,7 +20,7 @@ Summary:	Automates deployment of containerized applications
 Name:		docker
 Version:	20.10.6
 %global moby_version %{version}
-Release:	2
+Release:	3
 License:	ASL 2.0
 Epoch:		1
 Group:		System/Configuration/Other
@@ -42,6 +42,8 @@ Source11:	https://github.com/krallin/tini/archive/v%{tini_version}/tini-%{tini_v
 Source12:	https://github.com/docker/cli/archive/v%{version}/cli-%{version}.tar.gz
 # buildx
 Source13:	https://github.com/docker/buildx/archive/v%{buildx_version}/buildx-%{buildx_version}.tar.gz
+# (tpg) taken from https://gist.github.com/goll/bdd6b43c2023f82d15729e9b0067de60
+Source14:	nftables-docker.nft
 BuildRequires:	gcc
 BuildRequires:	glibc-devel
 BuildRequires:	glibc-static-devel
@@ -66,6 +68,8 @@ Requires:	crun
 # https://bugzilla.redhat.com/show_bug.cgi?id=1045220
 Requires:	xz
 Requires:	bridge-utils
+Requires(post):	nftables
+Requires(postun):	sed
 # https://bugzilla.redhat.com/show_bug.cgi?id=1034919
 # No longer needed in Fedora because of libcontainer
 Provides:	lxc-docker = %{version}
@@ -110,7 +114,7 @@ Requires:	%{repo} = %{EVRD}
 Requires:	zsh
 Provides:	%{repo}-io-zsh-completion = %{EVRD}
 
-%description	zsh-completion
+%description zsh-completion
 This package installs %{summary}.
 
 %prep
@@ -165,19 +169,14 @@ install -p -m 755 tini/build/tini-static %{buildroot}%{_bindir}/docker-init
 # Place to store images
 install -d %{buildroot}%{_var}/lib/docker
 
-%if 0
-# teach it about crun
 install -d %{buildroot}%{_sysconfdir}/docker
-cat >%{buildroot}%{_sysconfdir}/docker/daemon.json <<'EOF'
+# (tpg) we are using nftables
+cat > %{buildroot}%{_sysconfdir}/docker/daemon.json << 'EOF'
 {
-	"runtimes": {
-		"crun": {
-			"path": "%{_bindir}/crun"
-		}
-	}
+  "iptables": false
 }
 EOF
-%endif
+install -D -p -m 755 %{SOURCE14} %{buildroot}%{_sysconfdir}/nftables/%{name}.nft
 
 # install bash completion
 install -d %{buildroot}%{_sysconfdir}/bash_completion.d
@@ -239,22 +238,27 @@ install -Dpm 644 %{SOURCE4} %{buildroot}%{_sysusersdir}/%{name}.conf
 
 %post
 %systemd_post docker
+if [ -e %{_sysconfdir}/sysconfig/nftables.conf ] && ! grep -q docker.nft %{_sysconfdir}/sysconfig/nftables.conf; then
+    printf '%s\n' 'include "/etc/nftables/docker.nft"' >> %{_sysconfdir}/sysconfig/nftables.conf
+fi
 
 %preun
 %systemd_preun docker
 
 %postun
 %systemd_postun_with_restart docker
+if [ $1 == 0 ] && [ -e %{_sysconfdir}/sysconfig/nftables.conf ]; then
+    sed -i -e '/docker\.nft/d' %{_sysconfdir}/sysconfig/nftables.conf
+fi
 
 %files
 %config(noreplace) %{_sysconfdir}/sysconfig/%{repo}
 %config(noreplace) %{_sysconfdir}/sysconfig/%{repo}-network
 %config(noreplace) %{_sysconfdir}/sysconfig/%{repo}-storage
 %{_sysusersdir}/%{name}.conf
-%if 0
 %dir %{_sysconfdir}/docker
 %config(noreplace) %{_sysconfdir}/docker/daemon.json
-%endif
+%config(noreplace) %{_sysconfdir}/nftables/%{name}.nft
 %{_bindir}/docker
 %{_bindir}/docker-proxy
 %{_bindir}/docker-init
