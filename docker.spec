@@ -20,7 +20,7 @@ Summary:	Automates deployment of containerized applications
 Name:		docker
 Version:	20.10.6
 %global moby_version %{version}
-Release:	3
+Release:	4
 License:	ASL 2.0
 Epoch:		1
 Group:		System/Configuration/Other
@@ -171,9 +171,11 @@ install -d %{buildroot}%{_var}/lib/docker
 
 install -d %{buildroot}%{_sysconfdir}/docker
 # (tpg) we are using nftables
+# (bero) but for reasons yet to be determined, that prevents containers
+# from having net access -- allow them to keep using iptables for now
 cat > %{buildroot}%{_sysconfdir}/docker/daemon.json << 'EOF'
 {
-  "iptables": false
+  "iptables": true
 }
 EOF
 install -D -p -m 755 %{SOURCE14} %{buildroot}%{_sysconfdir}/nftables/%{name}.nft
