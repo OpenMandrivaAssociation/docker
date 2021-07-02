@@ -11,16 +11,16 @@
 %global gopath  %{_libdir}/golang
 %define gosrc %{gopath}/src/pkg/%{import_path}
 
-%global commit      f0014860c1b3345e1fcc7ed81c491298de2633fb
+%global commit      b0f5bc36fea9dfb9672e1e9b1278ebab797b9ee0
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 
 %global build_ldflags %{build_ldflags} --rtlib=libgcc --unwindlib=libgcc
 
 Summary:	Automates deployment of containerized applications
 Name:		docker
-Version:	20.10.6
+Version:	20.10.7
 %global moby_version %{version}
-Release:	4
+Release:	1
 License:	ASL 2.0
 Epoch:		1
 Group:		System/Configuration/Other
