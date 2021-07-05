@@ -20,7 +20,7 @@ Summary:	Automates deployment of containerized applications
 Name:		docker
 Version:	20.10.7
 %global moby_version %{version}
-Release:	1
+Release:	2
 License:	ASL 2.0
 Epoch:		1
 Group:		System/Configuration/Other
@@ -236,7 +236,7 @@ install -Dpm 644 %{SOURCE4} %{buildroot}%{_sysusersdir}/%{name}.conf
 #}
 
 %pre
-%sysusers_create_package docker.conf %{SOURCE4}
+%sysusers_create_package %{name} %{SOURCE4}
 
 %post
 %systemd_post docker
