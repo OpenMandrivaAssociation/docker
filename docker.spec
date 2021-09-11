@@ -20,7 +20,7 @@ Summary:	Automates deployment of containerized applications
 Name:		docker
 Version:	20.10.8
 %global moby_version %{version}
-Release:	1
+Release:	2
 License:	ASL 2.0
 Epoch:		1
 Group:		System/Configuration/Other
@@ -148,7 +148,10 @@ cd tini
 cd ../..
 
 # dockerd
-DOCKER_BUILDTAGS='seccomp journald' VERSION=%{moby_version} hack/make.sh dynbinary
+# FIXME restore to DOCKER_BUILDTAGS='seccomp journald' once
+# the seccomp rules are fixed for clone3 -- with clone3 broken,
+# dockerd acts up badly when a container contains glibc 2.34
+DOCKER_BUILDTAGS='journald' VERSION=%{moby_version} hack/make.sh dynbinary
 
 # docker-proxy
 cd libnetwork
