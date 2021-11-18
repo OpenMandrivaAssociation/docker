@@ -18,9 +18,9 @@
 
 Summary:	Automates deployment of containerized applications
 Name:		docker
-Version:	20.10.8
+Version:	20.10.11
 %global moby_version %{version}
-Release:	3
+Release:	1
 License:	ASL 2.0
 Epoch:		1
 Group:		System/Configuration/Other
@@ -44,7 +44,6 @@ Source12:	https://github.com/docker/cli/archive/v%{version}/cli-%{version}.tar.g
 Source13:	https://github.com/docker/buildx/archive/v%{buildx_version}/buildx-%{buildx_version}.tar.gz
 # (tpg) taken from https://gist.github.com/goll/bdd6b43c2023f82d15729e9b0067de60
 Source14:	nftables-docker.nft
-Patch0:		https://github.com/moby/moby/pull/42836.patch
 BuildRequires:	gcc
 BuildRequires:	glibc-devel
 BuildRequires:	glibc-static-devel
@@ -127,7 +126,7 @@ mv tini-%{tini_version} tini
 tar xf %{SOURCE12}
 tar xf %{SOURCE13}
 mv buildx-%{buildx_version} buildx
-find . -name "*~" |xargs rm
+find . -name "*~" |xargs rm || :
 
 %build
 mkdir -p GO/src/github.com/{docker,krallin}
