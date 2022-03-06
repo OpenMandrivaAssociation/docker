@@ -18,7 +18,7 @@
 
 Summary:	Automates deployment of containerized applications
 Name:		docker
-Version:	20.10.11
+Version:	20.10.12
 %global moby_version %{version}
 Release:	1
 License:	ASL 2.0
@@ -67,7 +67,9 @@ Requires:	crun
 # need xz to work with ubuntu images
 # https://bugzilla.redhat.com/show_bug.cgi?id=1045220
 Requires:	xz
+# Needed to share network with containers
 Requires:	bridge-utils
+Requires:	iptables
 Requires(post):	nftables
 Requires(postun):	sed
 # https://bugzilla.redhat.com/show_bug.cgi?id=1034919
