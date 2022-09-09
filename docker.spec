@@ -18,9 +18,9 @@
 
 Summary:	Automates deployment of containerized applications
 Name:		docker
-Version:	20.10.17
+Version:	20.10.18
 %global moby_version %{version}
-Release:	3
+Release:	1
 License:	ASL 2.0
 Epoch:		1
 Group:		System/Configuration/Other
@@ -44,6 +44,7 @@ Source12:	https://github.com/docker/cli/archive/v%{version}/cli-%{version}.tar.g
 Source13:	https://github.com/docker/buildx/archive/v%{buildx_version}/buildx-%{buildx_version}.tar.gz
 # (tpg) taken from https://gist.github.com/goll/bdd6b43c2023f82d15729e9b0067de60
 Source14:	nftables-docker.nft
+Patch0:		tini-clang15.patch
 BuildRequires:	gcc
 BuildRequires:	glibc-devel
 BuildRequires:	glibc-static-devel
@@ -120,7 +121,7 @@ Provides:	%{repo}-io-zsh-completion = %{EVRD}
 This package installs %{summary}.
 
 %prep
-%autosetup -p1 -n moby-%{version}
+%setup -q -n moby-%{version}
 tar xf %{SOURCE10}
 mv libnetwork-master libnetwork
 tar xf %{SOURCE11}
@@ -129,6 +130,9 @@ tar xf %{SOURCE12}
 tar xf %{SOURCE13}
 mv buildx-%{buildx_version} buildx
 find . -name "*~" |xargs rm || :
+# Needs to be done after unpacking extra bits, given we may want
+# to patch tini -- so no %%autosetup
+%autopatch -p1
 
 %build
 mkdir -p GO/src/github.com/{docker,krallin}
