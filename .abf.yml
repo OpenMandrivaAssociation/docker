@@ -2,5 +2,5 @@ sources:
   tini-0.19.0.tar.gz: 2245210bdd29faea02e566a192df4c7df702b264
   buildx-0.5.1.tar.gz: 5803fd02093f886beaca35553986216e02bbecec
   libnetwork-master.tar.gz: c1f5f8cc9cb16cf7bda8faf43436cd2f99253262
-  cli-20.10.20.tar.gz: e3e963c67a8edf07b98916d1cd9547c3d1a6034c
-  moby-20.10.20.tar.gz: f9886f9c79bccfd636034988c162cbbe67295c3d
+  cli-20.10.21.tar.gz: de621c114d483007e538d0dea7971ba993be73cd
+  moby-20.10.21.tar.gz: d51bac33385b433280d8e532167a0e30c5de5da2
