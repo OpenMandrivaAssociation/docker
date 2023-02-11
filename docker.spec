@@ -18,7 +18,7 @@
 
 Summary:	Automates deployment of containerized applications
 Name:		docker
-Version:	20.10.23
+Version:	23.0.1
 %global moby_version %{version}
 Release:	1
 License:	ASL 2.0
@@ -35,7 +35,7 @@ Source7:	%{repo}.socket
 Source8:	%{repo}-network-cleanup.sh
 Source9:	overlay.conf
 # docker-proxy
-Source10:	https://github.com/%{project}/libnetwork/archive/master/libnetwork-master.tar.gz
+Source10:	https://github.com/docker/libnetwork/archive/master/libnetwork-master.tar.gz
 # tini
 Source11:	https://github.com/krallin/tini/archive/v%{tini_version}/tini-%{tini_version}.tar.gz
 # cli
@@ -123,7 +123,8 @@ This package installs %{summary}.
 %prep
 %setup -q -n moby-%{version}
 tar xf %{SOURCE10}
-mv libnetwork-master libnetwork
+#rm -rf libnetwork
+#mv libnetwork-master libnetwork
 tar xf %{SOURCE11}
 mv tini-%{tini_version} tini
 tar xf %{SOURCE12}
@@ -137,7 +138,7 @@ find . -name "*~" |xargs rm || :
 %build
 mkdir -p GO/src/github.com/{docker,krallin}
 ln -s $(pwd)/cli-%{version} GO/src/github.com/docker/cli
-ln -s $(pwd)/libnetwork GO/src/github.com/docker/libnetwork
+ln -s $(pwd)/libnetwork-master GO/src/github.com/docker/libnetwork
 ln -s $(pwd)/tini GO/src/github.com/krallin/tini
 ln -s $(pwd) GO/src/github.com/docker/docker
 export DOCKER_GITCOMMIT="%{shortcommit}"
@@ -170,7 +171,7 @@ cd ..
 install -d %{buildroot}%{_bindir}
 install -p -m 755 cli-%{version}/build/docker-linux-* %{buildroot}%{_bindir}/docker
 install -d %{buildroot}%{_sbindir}
-install -p -m 755 bundles/dynbinary-daemon/dockerd-%{moby_version} %{buildroot}%{_sbindir}/dockerd
+install -p -m 755 bundles/dynbinary-daemon/dockerd %{buildroot}%{_sbindir}/dockerd
 install -p -m 755 libnetwork/proxy %{buildroot}%{_bindir}/docker-proxy
 install -p -m 755 tini/build/tini-static %{buildroot}%{_bindir}/docker-init
 
