@@ -2,5 +2,5 @@ sources:
   tini-0.19.0.tar.gz: 2245210bdd29faea02e566a192df4c7df702b264
   buildx-0.5.1.tar.gz: 5803fd02093f886beaca35553986216e02bbecec
   libnetwork-master.tar.gz: e632513e53df6e92eea278d6177dec30e2604ba4
-  cli-23.0.2.tar.gz: fbc1ccc8e2f5f4a087fd4794cf5a8f4b174231ef
-  moby-23.0.2.tar.gz: 37cefdda43ce96c29a2603b86b230cc9bc9aa94e
+  cli-23.0.3.tar.gz: abadf4f5ab75dddf705964b5561aef4bca8cdd6d
+  moby-23.0.3.tar.gz: 574b361ac4d90f5c7f6474ae6a8ff5d73f875bd8
