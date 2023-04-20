@@ -8,6 +8,7 @@
 %global import_path github.com/%{project}/%{repo}
 
 #debuginfo not supported with Go
+%undefine _debugsource_packages
 %global gopath  %{_libdir}/golang
 %define gosrc %{gopath}/src/pkg/%{import_path}
 
@@ -18,7 +19,7 @@
 
 Summary:	Automates deployment of containerized applications
 Name:		docker
-Version:	23.0.3
+Version:	23.0.4
 %global moby_version %{version}
 Release:	1
 License:	ASL 2.0
