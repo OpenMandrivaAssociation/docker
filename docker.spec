@@ -19,9 +19,9 @@
 
 Summary:	Automates deployment of containerized applications
 Name:		docker
-Version:	24.0.7
+Version:	25.0.0
 %global moby_version %{version}
-Release:	2
+Release:	1
 License:	ASL 2.0
 Epoch:		1
 Group:		System/Configuration/Other
