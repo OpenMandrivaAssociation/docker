@@ -15,11 +15,12 @@
 %global commit      b0f5bc36fea9dfb9672e1e9b1278ebab797b9ee0
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 
+%global optflags %{optflags} -Wno-error
 %global build_ldflags %{build_ldflags} --rtlib=libgcc --unwindlib=libgcc
 
 Summary:	Automates deployment of containerized applications
 Name:		docker
-Version:	25.0.2
+Version:	25.0.4
 %global moby_version %{version}
 Release:	1
 License:	ASL 2.0
