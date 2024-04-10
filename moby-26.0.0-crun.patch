@@ -1,0 +1,24 @@
+--- moby-26.0.0/vendor/github.com/moby/buildkit/executor/runcexecutor/executor_common.go.orig	2024-04-10 15:14:19.481788209 +0100
++++ moby-26.0.0/vendor/github.com/moby/buildkit/executor/runcexecutor/executor_common.go	2024-04-10 15:14:45.494898969 +0100
+@@ -23,9 +23,6 @@
+ 		return errUnsupportedConsole
+ 	}
+ 	extraArgs := []string{}
+-	if keep {
+-		extraArgs = append(extraArgs, "--keep")
+-	}
+ 	killer := newRunProcKiller(w.runc, id)
+ 	return w.commonCall(ctx, id, bundle, process, started, killer, func(ctx context.Context, started chan<- int, io runc.IO, pidfile string) error {
+ 		_, err := w.runc.Run(ctx, id, bundle, &runc.CreateOpts{
+--- moby-26.0.0/vendor/github.com/moby/buildkit/executor/runcexecutor/executor_linux.go.orig	2024-04-10 15:14:25.449584086 +0100
++++ moby-26.0.0/vendor/github.com/moby/buildkit/executor/runcexecutor/executor_linux.go	2024-04-10 15:14:32.847331161 +0100
+@@ -25,9 +25,6 @@
+ 	killer := newRunProcKiller(w.runc, id)
+ 	return w.callWithIO(ctx, id, bundle, process, started, killer, func(ctx context.Context, started chan<- int, io runc.IO, pidfile string) error {
+ 		extraArgs := []string{}
+-		if keep {
+-			extraArgs = append(extraArgs, "--keep")
+-		}
+ 		_, err := w.runc.Run(ctx, id, bundle, &runc.CreateOpts{
+ 			NoPivot:   w.noPivot,
+ 			Started:   started,

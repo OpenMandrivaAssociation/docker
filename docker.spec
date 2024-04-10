@@ -1,7 +1,7 @@
 # modifying the dockerinit binary breaks the SHA1 sum check by docker
 
 %global tini_version 0.19.0
-%global buildx_version 0.5.1
+%global buildx_version 0.13.1
 
 %global project docker
 %global repo %{project}
@@ -47,6 +47,8 @@ Source13:	https://github.com/docker/buildx/archive/v%{buildx_version}/buildx-%{b
 # (tpg) taken from https://gist.github.com/goll/bdd6b43c2023f82d15729e9b0067de60
 Source14:	nftables-docker.nft
 Patch0:		tini-clang15.patch
+# crun has no create --keep
+Patch1:		moby-26.0.0-crun.patch
 BuildRequires:	gcc
 BuildRequires:	glibc-devel
 BuildRequires:	glibc-static-devel
@@ -168,6 +170,11 @@ cd cli-%{version}
     DISABLE_WARN_OUTSIDE_CONTAINER=1 make VERSION=%{moby_version} LDFLAGS="-linkmode=external" dynbinary
 cd ..
 
+# buildx
+cd buildx
+   VERSION=%{buildx_version} REVISION=%{release} GO111MODULE=on hack/build
+cd ..
+
 %install
 # install binaries
 install -d %{buildroot}%{_bindir}
@@ -176,6 +183,9 @@ install -d %{buildroot}%{_sbindir}
 install -p -m 755 bundles/dynbinary-daemon/dockerd %{buildroot}%{_sbindir}/dockerd
 install -p -m 755 libnetwork/proxy %{buildroot}%{_bindir}/docker-proxy
 install -p -m 755 tini/build/tini-static %{buildroot}%{_bindir}/docker-init
+
+install -d -m 0755 %{buildroot}/%{_libexecdir}/docker/cli-plugins
+install -p -m 0755 buildx/bin/build/docker-buildx %{buildroot}/%{_libexecdir}/docker/cli-plugins/
 
 # Place to store images
 install -d %{buildroot}%{_var}/lib/docker
@@ -277,6 +287,7 @@ fi
 %{_bindir}/docker-init
 %{_sbindir}/docker-network-cleanup
 %{_sbindir}/dockerd
+%{_libexecdir}/docker/cli-plugins/docker-buildx
 %{_presetdir}/86-docker.preset
 %{_unitdir}/docker.service
 %{_unitdir}/docker.socket
