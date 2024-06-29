@@ -20,7 +20,7 @@
 
 Summary:	Automates deployment of containerized applications
 Name:		docker
-Version:	26.1.4
+Version:	27.0.2
 %global moby_version %{version}
 Release:	1
 License:	ASL 2.0
@@ -48,7 +48,7 @@ Source13:	https://github.com/docker/buildx/archive/v%{buildx_version}/buildx-%{b
 Source14:	nftables-docker.nft
 Patch0:		tini-clang15.patch
 # crun has no create --keep
-Patch1:		moby-26.0.0-crun.patch
+Patch1:		moby-27.0.2-crun.patch
 BuildRequires:	gcc
 BuildRequires:	glibc-devel
 BuildRequires:	glibc-static-devel
