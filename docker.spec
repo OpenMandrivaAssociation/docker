@@ -26,7 +26,7 @@ Release:	1
 License:	ASL 2.0
 Epoch:		1
 Group:		System/Configuration/Other
-URL:		http://www.docker.com
+URL:		https://www.docker.com
 Source0:	https://github.com/moby/moby/archive/v%{version}/moby-%{version}.tar.gz
 Source1:	%{repo}.service
 Source2:	%{repo}.sysconfig
