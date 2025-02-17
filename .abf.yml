@@ -1,6 +1,6 @@
 sources:
-  buildx-0.13.1.tar.gz: 1172eb2a6ad4405fb37cf1626cf744ac9801d1a9
-  libnetwork-master.tar.gz: e632513e53df6e92eea278d6177dec30e2604ba4
   tini-0.19.0.tar.gz: 2245210bdd29faea02e566a192df4c7df702b264
-  cli-27.5.0.tar.gz: cce63a08321558454b6c7e5e1d2026cef17fff36
-  moby-27.5.0.tar.gz: b0d1c565c4dad36c18b738d9943a71b0dbd00fdc
+  moby-27.5.1.tar.gz: a71409ce7243ee18b7b5c1110ea59f27c8cb09c7
+  libnetwork-master.tar.gz: 3d5fff39d764e56b927223527e3355c07a82939f
+  cli-27.5.1.tar.gz: 83aa2f57d81556a142d93a1d83b2ea37b9d1bd41
+  buildx-0.20.1.tar.gz: a90fdbc91b89dce031743135e71908bcb5ca3b83
