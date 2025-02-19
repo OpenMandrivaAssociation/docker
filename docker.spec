@@ -18,16 +18,21 @@
 %global optflags %{optflags} -Wno-error
 %global build_ldflags %{build_ldflags} --rtlib=libgcc --unwindlib=libgcc
 
+%define beta rc.3
+
 Summary:	Automates deployment of containerized applications
 Name:		docker
-Version:	27.5.1
-%global moby_version %{version}
-Release:	1
+Version:	28.0.0
+Release:	%{?beta:0.%{beta}.}1
 License:	ASL 2.0
 Epoch:		1
 Group:		System/Configuration/Other
 URL:		https://www.docker.com
+%if 0%{?beta:1}
+Source0:	https://github.com/moby/moby/archive/refs/tags/v%{version}%{?beta:-%{beta}}.tar.gz
+%else
 Source0:	https://github.com/moby/moby/archive/v%{version}/moby-%{version}.tar.gz
+%endif
 Source1:	%{repo}.service
 Source2:	%{repo}.sysconfig
 Source3:	%{repo}-storage.sysconfig
@@ -41,7 +46,7 @@ Source10:	https://github.com/docker/libnetwork/archive/master/libnetwork-master.
 # tini
 Source11:	https://github.com/krallin/tini/archive/v%{tini_version}/tini-%{tini_version}.tar.gz
 # cli
-Source12:	https://github.com/docker/cli/archive/v%{version}/cli-%{version}.tar.gz
+Source12:	https://github.com/docker/cli/archive/v%{version}%{?beta:-%{beta}}/cli-%{version}%{?beta?:-%{beta}}.tar.gz
 # buildx
 Source13:	https://github.com/docker/buildx/archive/v%{buildx_version}/buildx-%{buildx_version}.tar.gz
 # (tpg) taken from https://gist.github.com/goll/bdd6b43c2023f82d15729e9b0067de60
@@ -125,7 +130,7 @@ Provides:	%{repo}-io-zsh-completion = %{EVRD}
 This package installs %{summary}.
 
 %prep
-%setup -q -n moby-%{version}
+%setup -q -n moby-%{version}%{?beta:-%{beta}}
 tar xf %{SOURCE10}
 #rm -rf libnetwork
 #mv libnetwork-master libnetwork
@@ -141,7 +146,7 @@ find . -name "*~" |xargs rm || :
 
 %build
 mkdir -p GO/src/github.com/{docker,krallin}
-ln -s $(pwd)/cli-%{version} GO/src/github.com/docker/cli
+ln -s $(pwd)/cli-%{version}%{?beta:-%{beta}} GO/src/github.com/docker/cli
 ln -s $(pwd)/libnetwork-master GO/src/github.com/docker/libnetwork
 ln -s $(pwd)/tini GO/src/github.com/krallin/tini
 ln -s $(pwd) GO/src/github.com/docker/docker
@@ -158,7 +163,7 @@ cd tini
 cd ../..
 
 # dockerd
-DOCKER_BUILDTAGS='seccomp journald' VERSION=%{moby_version} hack/make.sh dynbinary
+DOCKER_BUILDTAGS='seccomp journald' VERSION=%{version} hack/make.sh dynbinary
 
 # docker-proxy
 cd libnetwork
@@ -166,8 +171,8 @@ cd libnetwork
 cd ..
 
 # cli
-cd cli-%{version}
-    DISABLE_WARN_OUTSIDE_CONTAINER=1 make VERSION=%{moby_version} LDFLAGS="-linkmode=external" dynbinary
+cd cli-%{version}%{?beta:-%{beta}}
+    DISABLE_WARN_OUTSIDE_CONTAINER=1 make VERSION=%{version} LDFLAGS="-linkmode=external" dynbinary
 cd ..
 
 # buildx
@@ -178,7 +183,7 @@ cd ..
 %install
 # install binaries
 install -d %{buildroot}%{_bindir}
-install -p -m 755 cli-%{version}/build/docker-linux-* %{buildroot}%{_bindir}/docker
+install -p -m 755 cli-%{version}%{?beta:-%{beta}}/build/docker-linux-* %{buildroot}%{_bindir}/docker
 install -d %{buildroot}%{_sbindir}
 install -p -m 755 bundles/dynbinary-daemon/dockerd %{buildroot}%{_sbindir}/dockerd
 install -p -m 755 libnetwork/proxy %{buildroot}%{_bindir}/docker-proxy
@@ -203,17 +208,17 @@ install -D -p -m 755 %{SOURCE14} %{buildroot}%{_sysconfdir}/nftables/%{name}.nft
 
 # install bash completion
 install -d %{buildroot}%{_sysconfdir}/bash_completion.d
-install -p -m 644 cli-%{version}/contrib/completion/bash/docker %{buildroot}%{_sysconfdir}/bash_completion.d/docker.bash
+install -p -m 644 cli-%{version}%{?beta:-%{beta}}/contrib/completion/bash/docker %{buildroot}%{_sysconfdir}/bash_completion.d/docker.bash
 
 # install zsh completion
 install -d %{buildroot}%{_datadir}/zsh/site-functions
-install -p -m 644 cli-%{version}/contrib/completion/zsh/_docker %{buildroot}%{_datadir}/zsh/site-functions
+install -p -m 644 cli-%{version}%{?beta:-%{beta}}/contrib/completion/zsh/_docker %{buildroot}%{_datadir}/zsh/site-functions
 
 # install fish completion
 # create, install and own /usr/share/fish/vendor_completions.d until
 # upstream fish provides it
 install -dp %{buildroot}%{_datadir}/fish/vendor_completions.d
-install -p -m 644 cli-%{version}/contrib/completion/fish/%{repo}.fish %{buildroot}%{_datadir}/fish/vendor_completions.d
+install -p -m 644 cli-%{version}%{?beta:-%{beta}}/contrib/completion/fish/%{repo}.fish %{buildroot}%{_datadir}/fish/vendor_completions.d
 
 # install udev rules
 install -d %{buildroot}%{_udevrulesdir}
