@@ -40,8 +40,6 @@ Source6:	%{repo}-network.sysconfig
 Source7:	%{repo}.socket
 Source8:	%{repo}-network-cleanup.sh
 Source9:	overlay.conf
-# docker-proxy
-Source10:	https://github.com/docker/libnetwork/archive/master/libnetwork-master.tar.gz
 # tini
 Source11:	https://github.com/krallin/tini/archive/v%{tini_version}/tini-%{tini_version}.tar.gz
 # cli
