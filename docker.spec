@@ -18,12 +18,12 @@
 %global optflags %{optflags} -Wno-error
 %global build_ldflags %{build_ldflags} --rtlib=libgcc --unwindlib=libgcc
 
-%define beta rc.3
+#define beta rc.3
 
 Summary:	Automates deployment of containerized applications
 Name:		docker
 Version:	28.0.0
-Release:	%{?beta:0.%{beta}.}2
+Release:	%{?beta:0.%{beta}.}1
 License:	ASL 2.0
 Group:		System/Configuration/Other
 URL:		https://www.docker.com
