@@ -1,7 +1,7 @@
 # modifying the dockerinit binary breaks the SHA1 sum check by docker
 
 %global tini_version 0.19.0
-%global buildx_version 0.20.1
+%global buildx_version 0.21.0
 
 %global project docker
 %global repo %{project}
@@ -23,9 +23,8 @@
 Summary:	Automates deployment of containerized applications
 Name:		docker
 Version:	28.0.0
-Release:	%{?beta:0.%{beta}.}1
+Release:	%{?beta:0.%{beta}.}2
 License:	ASL 2.0
-Epoch:		1
 Group:		System/Configuration/Other
 URL:		https://www.docker.com
 %if 0%{?beta:1}
@@ -131,9 +130,6 @@ This package installs %{summary}.
 
 %prep
 %setup -q -n moby-%{version}%{?beta:-%{beta}}
-tar xf %{SOURCE10}
-#rm -rf libnetwork
-#mv libnetwork-master libnetwork
 tar xf %{SOURCE11}
 mv tini-%{tini_version} tini
 tar xf %{SOURCE12}
@@ -165,11 +161,6 @@ cd ../..
 # dockerd
 DOCKER_BUILDTAGS='seccomp journald' VERSION=%{version} hack/make.sh dynbinary
 
-# docker-proxy
-cd libnetwork
-    go build -ldflags='-linkmode=external' github.com/docker/libnetwork/cmd/proxy
-cd ..
-
 # cli
 cd cli-%{version}%{?beta:-%{beta}}
     DISABLE_WARN_OUTSIDE_CONTAINER=1 make VERSION=%{version} LDFLAGS="-linkmode=external" dynbinary
@@ -186,7 +177,7 @@ install -d %{buildroot}%{_bindir}
 install -p -m 755 cli-%{version}%{?beta:-%{beta}}/build/docker-linux-* %{buildroot}%{_bindir}/docker
 install -d %{buildroot}%{_sbindir}
 install -p -m 755 bundles/dynbinary-daemon/dockerd %{buildroot}%{_sbindir}/dockerd
-install -p -m 755 libnetwork/proxy %{buildroot}%{_bindir}/docker-proxy
+install -p -m 755 bundles/dynbinary-daemon/docker-proxy %{buildroot}%{_bindir}/docker-proxy
 install -p -m 755 tini/build/tini-static %{buildroot}%{_bindir}/docker-init
 
 install -d -m 0755 %{buildroot}/%{_libexecdir}/docker/cli-plugins
