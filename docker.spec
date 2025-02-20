@@ -47,10 +47,9 @@ Source12:	https://github.com/docker/cli/archive/v%{version}%{?beta:-%{beta}}/cli
 # buildx
 Source13:	https://github.com/docker/buildx/archive/v%{buildx_version}/buildx-%{buildx_version}.tar.gz
 # (tpg) taken from https://gist.github.com/goll/bdd6b43c2023f82d15729e9b0067de60
+# Not currently used, kept here for reference
 Source14:	nftables-docker.nft
 Patch0:		tini-clang15.patch
-# crun has no create --keep
-Patch1:		moby-27.0.2-crun.patch
 BuildRequires:	gcc
 BuildRequires:	glibc-devel
 BuildRequires:	glibc-static-devel
@@ -77,8 +76,6 @@ Requires:	xz
 # Needed to share network with containers
 Requires:	bridge-utils
 Requires:	iptables
-Requires(post):	nftables
-Requires(postun):	sed
 # https://bugzilla.redhat.com/show_bug.cgi?id=1034919
 # No longer needed in Fedora because of libcontainer
 Provides:	lxc-docker = %{version}
@@ -186,14 +183,9 @@ install -d %{buildroot}%{_var}/lib/docker
 
 install -d %{buildroot}%{_sysconfdir}/docker
 # (tpg) we are using nftables
-# (bero) but for reasons yet to be determined, that prevents containers
-# from having net access -- allow them to keep using iptables for now
-cat > %{buildroot}%{_sysconfdir}/docker/daemon.json << 'EOF'
-{
-  "iptables": true
-}
-EOF
-install -D -p -m 755 %{SOURCE14} %{buildroot}%{_sysconfdir}/nftables/%{name}.nft
+# (bero) but the approach of this ruleset breaks adding interfaces/ports
+# dynamically, so for now we're letting docker use iptables-legacy
+#install -D -p -m 755 %{SOURCE14} %{buildroot}%{_sysconfdir}/nftables/%{name}.nft
 
 # install bash completion
 install -d %{buildroot}%{_sysconfdir}/bash_completion.d
@@ -250,32 +242,13 @@ install -Dpm 644 %{SOURCE4} %{buildroot}%{_sysusersdir}/%{name}.conf
     #popd
 #}
 
-%pre
-%sysusers_create_package %{name} %{SOURCE4}
-
-%post
-%systemd_post docker
-if [ -e %{_sysconfdir}/sysconfig/nftables.conf ] && ! grep -q docker.nft %{_sysconfdir}/sysconfig/nftables.conf; then
-    printf '%s\n' 'include "/etc/nftables/docker.nft"' >> %{_sysconfdir}/sysconfig/nftables.conf
-fi
-
-%preun
-%systemd_preun docker
-
-%postun
-%systemd_postun_with_restart docker
-if [ $1 == 0 ] && [ -e %{_sysconfdir}/sysconfig/nftables.conf ]; then
-    sed -i -e '/docker\.nft/d' %{_sysconfdir}/sysconfig/nftables.conf
-fi
-
 %files
 %config(noreplace) %{_sysconfdir}/sysconfig/%{repo}
 %config(noreplace) %{_sysconfdir}/sysconfig/%{repo}-network
 %config(noreplace) %{_sysconfdir}/sysconfig/%{repo}-storage
 %{_sysusersdir}/%{name}.conf
 %dir %{_sysconfdir}/docker
-%config(noreplace) %{_sysconfdir}/docker/daemon.json
-%config(noreplace) %{_sysconfdir}/nftables/%{name}.nft
+%config(noreplace) %ghost %{_sysconfdir}/docker/daemon.json
 %{_bindir}/docker
 %{_bindir}/docker-proxy
 %{_bindir}/docker-init
