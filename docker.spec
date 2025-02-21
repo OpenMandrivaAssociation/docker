@@ -54,7 +54,7 @@ BuildRequires:	libltdl-devel
 # FIXME this should eventually be using golang again.
 # We currently can't go past 1.23 because of
 # https://github.com/moby/moby/issues/49513
-BuildRequires:	go1.23
+BuildRequires:	go1.23 go1.23-bin go1.23-shared
 BuildRequires:	pkgconfig(sqlite3)
 BuildRequires:	go-md2man
 BuildRequires:	pkgconfig(devmapper)
