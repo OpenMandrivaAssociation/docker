@@ -1,5 +1,5 @@
 sources:
   tini-0.19.0.tar.gz: 2245210bdd29faea02e566a192df4c7df702b264
   buildx-0.21.0.tar.gz: 4870c9d4981ece843f85a4e0bbc289eab358d3f9
-  cli-27.5.1.tar.gz: 83aa2f57d81556a142d93a1d83b2ea37b9d1bd41
-  moby-27.5.1.tar.gz: a71409ce7243ee18b7b5c1110ea59f27c8cb09c7
+  cli-27.5.0.tar.gz: cce63a08321558454b6c7e5e1d2026cef17fff36
+  moby-27.5.0.tar.gz: b0d1c565c4dad36c18b738d9943a71b0dbd00fdc

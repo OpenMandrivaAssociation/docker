@@ -22,7 +22,7 @@
 
 Summary:	Automates deployment of containerized applications
 Name:		docker
-Version:	27.5.1
+Version:	27.5.0
 Release:	%{?beta:0.%{beta}.}1
 License:	ASL 2.0
 Group:		System/Configuration/Other
