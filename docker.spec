@@ -23,7 +23,7 @@
 Summary:	Automates deployment of containerized applications
 Name:		docker
 Version:	28.0.0
-Release:	%{?beta:0.%{beta}.}2
+Release:	%{?beta:0.%{beta}.}3
 License:	ASL 2.0
 Group:		System/Configuration/Other
 URL:		https://www.docker.com
@@ -54,8 +54,10 @@ BuildRequires:	gcc
 BuildRequires:	glibc-devel
 BuildRequires:	glibc-static-devel
 BuildRequires:	libltdl-devel
-# ensure build uses golang 1.4 or above
-BuildRequires:	golang >= 1.7
+# FIXME this should eventually be using golang again.
+# We currently can't go past 1.23 because of
+# https://github.com/moby/moby/issues/49513
+BuildRequires:	go1.23
 BuildRequires:	pkgconfig(sqlite3)
 BuildRequires:	go-md2man
 BuildRequires:	pkgconfig(devmapper)
