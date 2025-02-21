@@ -12,9 +12,6 @@
 %global gopath  %{_libdir}/golang
 %define gosrc %{gopath}/src/pkg/%{import_path}
 
-%global commit      b0f5bc36fea9dfb9672e1e9b1278ebab797b9ee0
-%global shortcommit %(c=%{commit}; echo ${c:0:7})
-
 %global optflags %{optflags} -Wno-error
 %global build_ldflags %{build_ldflags} --rtlib=libgcc --unwindlib=libgcc
 
@@ -143,7 +140,7 @@ ln -s $(pwd)/cli-%{version}%{?beta:-%{beta}} GO/src/github.com/docker/cli
 ln -s $(pwd)/libnetwork-master GO/src/github.com/docker/libnetwork
 ln -s $(pwd)/tini GO/src/github.com/krallin/tini
 ln -s $(pwd) GO/src/github.com/docker/docker
-export DOCKER_GITCOMMIT="%{shortcommit}"
+export DOCKER_GITCOMMIT="OpenMandriva-%{version}-%{release}"
 export DOCKER_CLI_EXPERIMENTAL=enabled
 export TMP_GOPATH="$(pwd)/GO"
 export GOPATH=%{gopath}:"$(pwd)/GO"
