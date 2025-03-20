@@ -1,7 +1,7 @@
 # modifying the dockerinit binary breaks the SHA1 sum check by docker
 
 %global tini_version 0.19.0
-%global buildx_version 0.21.0
+%global buildx_version 0.22.0
 
 %global project docker
 %global repo %{project}
@@ -19,7 +19,7 @@
 
 Summary:	Automates deployment of containerized applications
 Name:		docker
-Version:	28.0.1
+Version:	28.0.2
 Release:	%{?beta:0.%{beta}.}1
 License:	ASL 2.0
 Group:		System/Configuration/Other
