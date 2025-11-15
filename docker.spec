@@ -1,16 +1,11 @@
-# modifying the dockerinit binary breaks the SHA1 sum check by docker
-
 %global tini_version 0.19.0
-%global buildx_version 0.25.0
 
 %global project docker
 %global repo %{project}
 %global import_path github.com/%{project}/%{repo}
 
-#debuginfo not supported with Go
+#debuginfo not fully supported with Go
 %undefine _debugsource_packages
-%global gopath  %{_libdir}/golang
-%define gosrc %{gopath}/src/pkg/%{import_path}
 
 %global optflags %{optflags} -Wno-error
 %global build_ldflags %{build_ldflags} --rtlib=libgcc --unwindlib=libgcc
@@ -19,7 +14,7 @@
 
 Summary:	Automates deployment of containerized applications
 Name:		docker
-Version:	28.5.2
+Version:	29.0.1
 Release:	%{?beta:0.%{beta}.}1
 License:	ASL 2.0
 Group:		System/Configuration/Other
@@ -27,7 +22,7 @@ URL:		https://www.docker.com
 %if 0%{?beta:1}
 Source0:	https://github.com/moby/moby/archive/refs/tags/v%{version}%{?beta:-%{beta}}.tar.gz
 %else
-Source0:	https://github.com/moby/moby/archive/v%{version}/moby-%{version}.tar.gz
+Source0:	https://github.com/moby/moby/archive/refs/tags/docker-v%{version}.tar.gz
 %endif
 Source1:	%{repo}.service
 Source2:	%{repo}.sysconfig
@@ -39,10 +34,6 @@ Source8:	%{repo}-network-cleanup.sh
 Source9:	overlay.conf
 # tini
 Source11:	https://github.com/krallin/tini/archive/v%{tini_version}/tini-%{tini_version}.tar.gz
-# cli
-Source12:	https://github.com/docker/cli/archive/v%{version}%{?beta:-%{beta}}/cli-%{version}%{?beta?:-%{beta}}.tar.gz
-# buildx
-Source13:	https://github.com/docker/buildx/archive/v%{buildx_version}/buildx-%{buildx_version}.tar.gz
 # (tpg) taken from https://gist.github.com/goll/bdd6b43c2023f82d15729e9b0067de60
 # Not currently used, kept here for reference
 Source14:	nftables-docker.nft
@@ -60,6 +51,7 @@ BuildRequires:	pkgconfig(systemd)
 BuildRequires:	systemd
 BuildRequires:	libtool-devel
 BuildRequires:	pkgconfig(libseccomp)
+BuildRequires:	pkgconfig(libnftables)
 BuildRequires:	cmake
 Requires(pre):	systemd
 %systemd_requires
@@ -72,6 +64,10 @@ Requires:	xz
 # Needed to share network with containers
 Requires:	bridge-utils
 Requires:	iptables
+# It may make sense to make this a Recommends: in the future
+# For now, let's keep it a hard requirement because it used to
+# be directly in this package
+Requires:	docker-cli
 # https://bugzilla.redhat.com/show_bug.cgi?id=1034919
 # No longer needed in Fedora because of libcontainer
 Provides:	lxc-docker = %{version}
@@ -86,14 +82,6 @@ Docker containers can encapsulate any payload, and will run consistently on
 and between virtually any server. The same container that a developer builds
 and tests on a laptop will run at scale, in production*, on VMs, bare-metal
 servers, OpenStack clusters, public instances, or combinations of the above.
-
-%package fish-completion
-Summary:	fish completion files for Docker
-Requires:	%{repo} = %{EVRD}
-Provides:	%{repo}-io-fish-completion = %{EVRD}
-
-%description fish-completion
-This package installs %{summary}.
 
 %package unit-test
 Summary:	%{summary} - for running unit tests
@@ -110,69 +98,34 @@ Provides:	%{repo}-io-vim = %{EVRD}
 %description vim
 This package installs %{summary}.
 
-%package zsh-completion
-Summary:	zsh completion files for Docker
-Requires:	%{repo} = %{EVRD}
-Requires:	zsh
-Provides:	%{repo}-io-zsh-completion = %{EVRD}
-
-%description zsh-completion
-This package installs %{summary}.
-
 %prep
-%setup -q -n moby-%{version}%{?beta:-%{beta}}
+%setup -q -n moby-docker-v%{version}%{?beta:-%{beta}}
 tar xf %{SOURCE11}
 mv tini-%{tini_version} tini
-tar xf %{SOURCE12}
-tar xf %{SOURCE13}
-mv buildx-%{buildx_version} buildx
 find . -name "*~" |xargs rm || :
 # Needs to be done after unpacking extra bits, given we may want
 # to patch tini -- so no %%autosetup
 %autopatch -p1
 
 %build
-mkdir -p GO/src/github.com/{docker,krallin}
-ln -s $(pwd)/cli-%{version}%{?beta:-%{beta}} GO/src/github.com/docker/cli
-ln -s $(pwd)/libnetwork-master GO/src/github.com/docker/libnetwork
-ln -s $(pwd)/tini GO/src/github.com/krallin/tini
-ln -s $(pwd) GO/src/github.com/docker/docker
 export DOCKER_GITCOMMIT="OpenMandriva-%{version}-%{release}"
 export DOCKER_CLI_EXPERIMENTAL=enabled
-export TMP_GOPATH="$(pwd)/GO"
-export GOPATH=%{gopath}:"$(pwd)/GO"
-export GO111MODULE=off
 
 # docker-init
 cd tini
-    %cmake
-    %make_build tini-static
+	%cmake
+	%make_build tini-static
 cd ../..
 
 # dockerd
 DOCKER_BUILDTAGS='seccomp journald' VERSION=%{version} hack/make.sh dynbinary
 
-# cli
-cd cli-%{version}%{?beta:-%{beta}}
-    DISABLE_WARN_OUTSIDE_CONTAINER=1 make VERSION=%{version} LDFLAGS="-linkmode=external" dynbinary
-cd ..
-
-# buildx
-cd buildx
-   VERSION=%{buildx_version} REVISION=%{release} GO111MODULE=on hack/build
-cd ..
-
 %install
 # install binaries
-install -d %{buildroot}%{_bindir}
-install -p -m 755 cli-%{version}%{?beta:-%{beta}}/build/docker-linux-* %{buildroot}%{_bindir}/docker
 install -d %{buildroot}%{_sbindir}
 install -p -m 755 bundles/dynbinary-daemon/dockerd %{buildroot}%{_sbindir}/dockerd
 install -p -m 755 bundles/dynbinary-daemon/docker-proxy %{buildroot}%{_bindir}/docker-proxy
 install -p -m 755 tini/build/tini-static %{buildroot}%{_bindir}/docker-init
-
-install -d -m 0755 %{buildroot}/%{_libexecdir}/docker/cli-plugins
-install -p -m 0755 buildx/bin/build/docker-buildx %{buildroot}/%{_libexecdir}/docker/cli-plugins/
 
 # Place to store images
 install -d %{buildroot}%{_var}/lib/docker
@@ -183,23 +136,13 @@ install -d %{buildroot}%{_sysconfdir}/docker
 # dynamically, so for now we're letting docker use iptables-legacy
 #install -D -p -m 755 %{SOURCE14} %{buildroot}%{_sysconfdir}/nftables/%{name}.nft
 
-# install bash completion
-install -d %{buildroot}%{_sysconfdir}/bash_completion.d
-install -p -m 644 cli-%{version}%{?beta:-%{beta}}/contrib/completion/bash/docker %{buildroot}%{_sysconfdir}/bash_completion.d/docker.bash
-
-# install zsh completion
-install -d %{buildroot}%{_datadir}/zsh/site-functions
-install -p -m 644 cli-%{version}%{?beta:-%{beta}}/contrib/completion/zsh/_docker %{buildroot}%{_datadir}/zsh/site-functions
-
-# install fish completion
-# create, install and own /usr/share/fish/vendor_completions.d until
-# upstream fish provides it
-install -dp %{buildroot}%{_datadir}/fish/vendor_completions.d
-install -p -m 644 cli-%{version}%{?beta:-%{beta}}/contrib/completion/fish/%{repo}.fish %{buildroot}%{_datadir}/fish/vendor_completions.d
-
 # install udev rules
 install -d %{buildroot}%{_udevrulesdir}
-install -p -m 644 contrib/udev/80-docker.rules %{buildroot}%{_udevrulesdir}
+cat >%{buildroot}%{_udevrulesdir}/80-docker.rules <<'EOF'
+# hide docker's loopback devices from udisks, and thus from user desktops
+SUBSYSTEM=="block", ENV{DM_NAME}=="docker-*", ENV{UDISKS_PRESENTATION_HIDE}="1", ENV{UDISKS_IGNORE}="1"
+SUBSYSTEM=="block", DEVPATH=="/devices/virtual/block/loop*", ATTR{loop/backing_file}=="/var/lib/docker/*", ENV{UDISKS_PRESENTATION_HIDE}="1", ENV{UDISKS_IGNORE}="1"
+EOF
 # install storage dir
 install -d -m 700 %{buildroot}%{_var}/lib/docker
 # install systemd/init scripts
@@ -245,25 +188,14 @@ install -Dpm 644 %{SOURCE4} %{buildroot}%{_sysusersdir}/%{name}.conf
 %{_sysusersdir}/%{name}.conf
 %dir %{_sysconfdir}/docker
 %config(noreplace) %ghost %{_sysconfdir}/docker/daemon.json
-%{_bindir}/docker
 %{_bindir}/docker-proxy
 %{_bindir}/docker-init
 %{_sbindir}/docker-network-cleanup
 %{_sbindir}/dockerd
-%{_libexecdir}/docker/cli-plugins/docker-buildx
 %{_presetdir}/86-docker.preset
 %{_unitdir}/docker.service
 %{_unitdir}/docker.socket
-%dir %{_sysconfdir}/bash_completion.d
-%{_sysconfdir}/bash_completion.d/docker.bash
 %dir %{_var}/lib/docker
 %dir %{_udevrulesdir}
 %{_udevrulesdir}/80-docker.rules
 %{_sysconfdir}/modules-load.d/overlay.conf
-
-%files fish-completion
-%dir %{_datadir}/fish/vendor_completions.d/
-%{_datadir}/fish/vendor_completions.d/%{repo}.fish
-
-%files zsh-completion
-%{_datadir}/zsh/site-functions/_%{repo}
