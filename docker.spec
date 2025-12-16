@@ -1,5 +1,3 @@
-%global tini_version 0.19.0
-
 %global project docker
 %global repo %{project}
 %global import_path github.com/%{project}/%{repo}
@@ -14,7 +12,7 @@
 
 Summary:	Automates deployment of containerized applications
 Name:		docker
-Version:	29.1.2
+Version:	29.1.3
 Release:	%{?beta:0.%{beta}.}1
 License:	ASL 2.0
 Group:		System/Configuration/Other
@@ -32,12 +30,9 @@ Source6:	%{repo}-network.sysconfig
 Source7:	%{repo}.socket
 Source8:	%{repo}-network-cleanup.sh
 Source9:	overlay.conf
-# tini
-Source11:	https://github.com/krallin/tini/archive/v%{tini_version}/tini-%{tini_version}.tar.gz
 # (tpg) taken from https://gist.github.com/goll/bdd6b43c2023f82d15729e9b0067de60
 # Not currently used, kept here for reference
 Source14:	nftables-docker.nft
-Patch0:		tini-clang15.patch
 BuildRequires:	gcc
 BuildRequires:	glibc-devel
 BuildRequires:	glibc-static-devel
@@ -99,23 +94,12 @@ Provides:	%{repo}-io-vim = %{EVRD}
 This package installs %{summary}.
 
 %prep
-%setup -q -n moby-docker-v%{version}%{?beta:-%{beta}}
-tar xf %{SOURCE11}
-mv tini-%{tini_version} tini
+%autosetup -p1 -n moby-docker-v%{version}%{?beta:-%{beta}}
 find . -name "*~" |xargs rm || :
-# Needs to be done after unpacking extra bits, given we may want
-# to patch tini -- so no %%autosetup
-%autopatch -p1
 
 %build
 export DOCKER_GITCOMMIT="OpenMandriva-%{version}-%{release}"
 export DOCKER_CLI_EXPERIMENTAL=enabled
-
-# docker-init
-cd tini
-	%cmake
-	%make_build tini-static
-cd ../..
 
 # dockerd
 DOCKER_BUILDTAGS='seccomp journald' VERSION=%{version} hack/make.sh dynbinary
@@ -125,7 +109,7 @@ DOCKER_BUILDTAGS='seccomp journald' VERSION=%{version} hack/make.sh dynbinary
 install -d %{buildroot}%{_sbindir}
 install -p -m 755 bundles/dynbinary-daemon/dockerd %{buildroot}%{_sbindir}/dockerd
 install -p -m 755 bundles/dynbinary-daemon/docker-proxy %{buildroot}%{_bindir}/docker-proxy
-install -p -m 755 tini/build/tini-static %{buildroot}%{_bindir}/docker-init
+#install -p -m 755 tini/build/tini-static %{buildroot}%{_bindir}/docker-init
 
 # Place to store images
 install -d %{buildroot}%{_var}/lib/docker
@@ -189,7 +173,7 @@ install -Dpm 644 %{SOURCE4} %{buildroot}%{_sysusersdir}/%{name}.conf
 %dir %{_sysconfdir}/docker
 %config(noreplace) %ghost %{_sysconfdir}/docker/daemon.json
 %{_bindir}/docker-proxy
-%{_bindir}/docker-init
+#%{_bindir}/docker-init
 %{_sbindir}/docker-network-cleanup
 %{_sbindir}/dockerd
 %{_presetdir}/86-docker.preset
