@@ -50,6 +50,8 @@ BuildRequires:	pkgconfig(libnftables)
 BuildRequires:	cmake
 Requires(pre):	systemd
 %systemd_requires
+# For "docker run --init"
+Requires:	tini-static
 # With docker >= 1.11 you now need containerd (and runC or crun as a dep)
 Requires:	containerd >= 0.2.3
 Requires:	crun
@@ -109,7 +111,7 @@ DOCKER_BUILDTAGS='seccomp journald' VERSION=%{version} hack/make.sh dynbinary
 install -d %{buildroot}%{_sbindir}
 install -p -m 755 bundles/dynbinary-daemon/dockerd %{buildroot}%{_sbindir}/dockerd
 install -p -m 755 bundles/dynbinary-daemon/docker-proxy %{buildroot}%{_bindir}/docker-proxy
-#install -p -m 755 tini/build/tini-static %{buildroot}%{_bindir}/docker-init
+ln -s tini-static %{buildroot}%{_bindir}/docker-init
 
 # Place to store images
 install -d %{buildroot}%{_var}/lib/docker
@@ -173,7 +175,7 @@ install -Dpm 644 %{SOURCE4} %{buildroot}%{_sysusersdir}/%{name}.conf
 %dir %{_sysconfdir}/docker
 %config(noreplace) %ghost %{_sysconfdir}/docker/daemon.json
 %{_bindir}/docker-proxy
-#%{_bindir}/docker-init
+%{_bindir}/docker-init
 %{_sbindir}/docker-network-cleanup
 %{_sbindir}/dockerd
 %{_presetdir}/86-docker.preset
