@@ -13,7 +13,7 @@
 Summary:	Automates deployment of containerized applications
 Name:		docker
 Version:	29.1.3
-Release:	%{?beta:0.%{beta}.}1
+Release:	%{?beta:0.%{beta}.}2
 License:	ASL 2.0
 Group:		System/Configuration/Other
 URL:		https://www.docker.com
@@ -26,6 +26,7 @@ Source1:	%{repo}.service
 Source2:	%{repo}.sysconfig
 Source3:	%{repo}-storage.sysconfig
 Source4:	docker.sysusers
+Source5:	daemon.json
 Source6:	%{repo}-network.sysconfig
 Source7:	%{repo}.socket
 Source8:	%{repo}-network-cleanup.sh
@@ -50,6 +51,8 @@ BuildRequires:	pkgconfig(libnftables)
 BuildRequires:	cmake
 Requires(pre):	systemd
 %systemd_requires
+# For Docker remapping (subuid and subgid)
+Requires:   setup >= 2.9.5
 # For "docker run --init"
 Requires:	tini-static
 # With docker >= 1.11 you now need containerd (and runC or crun as a dep)
@@ -136,6 +139,9 @@ install -d %{buildroot}%{_unitdir}
 install -p -m 644 %{SOURCE1} %{SOURCE7} %{buildroot}%{_unitdir}
 
 # for additional args
+install -d %{buildroot}%{_sysconfdir}/docker/
+install -p -m 644 %{SOURCE5} %{buildroot}%{_sysconfdir}/docker/daemon.json
+
 install -d %{buildroot}%{_sysconfdir}/sysconfig/
 install -p -m 644 %{SOURCE2} %{buildroot}%{_sysconfdir}/sysconfig/%{repo}
 install -p -m 644 %{SOURCE6} %{buildroot}%{_sysconfdir}/sysconfig/%{repo}-network
@@ -168,12 +174,12 @@ install -Dpm 644 %{SOURCE4} %{buildroot}%{_sysusersdir}/%{name}.conf
 #}
 
 %files
+%config(noreplace) %{_sysconfdir}/docker/daemon.json
 %config(noreplace) %{_sysconfdir}/sysconfig/%{repo}
 %config(noreplace) %{_sysconfdir}/sysconfig/%{repo}-network
 %config(noreplace) %{_sysconfdir}/sysconfig/%{repo}-storage
 %{_sysusersdir}/%{name}.conf
 %dir %{_sysconfdir}/docker
-%config(noreplace) %ghost %{_sysconfdir}/docker/daemon.json
 %{_bindir}/docker-proxy
 %{_bindir}/docker-init
 %{_sbindir}/docker-network-cleanup
