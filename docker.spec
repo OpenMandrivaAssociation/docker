@@ -13,7 +13,7 @@
 Summary:	Automates deployment of containerized applications
 Name:		docker
 Version:	29.2.1
-Release:	%{?beta:0.%{beta}.}1
+Release:	%{?beta:0.%{beta}.}2
 License:	ASL 2.0
 Group:		System/Configuration/Other
 URL:		https://www.docker.com
@@ -38,7 +38,7 @@ BuildRequires:	gcc
 BuildRequires:	glibc-devel
 BuildRequires:	glibc-static-devel
 BuildRequires:	libltdl-devel
-BuildRequires:	golang >= 1.24.3
+BuildRequires:	golang >= 1.26.0
 BuildRequires:	pkgconfig(sqlite3)
 BuildRequires:	go-md2man
 BuildRequires:	pkgconfig(devmapper)
