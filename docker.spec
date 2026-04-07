@@ -12,7 +12,7 @@
 
 Summary:	Automates deployment of containerized applications
 Name:		docker
-Version:	29.3.0
+Version:	29.4.0
 Release:	%{?beta:0.%{beta}.}1
 License:	ASL 2.0
 Group:		System/Configuration/Other
