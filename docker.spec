@@ -12,7 +12,7 @@
 
 Summary:	Automates deployment of containerized applications
 Name:		docker
-Version:	29.4.0
+Version:	29.4.2
 Release:	%{?beta:0.%{beta}.}1
 License:	ASL 2.0
 Group:		System/Configuration/Other
@@ -37,7 +37,6 @@ Source14:	nftables-docker.nft
 BuildRequires:	gcc
 BuildRequires:	glibc-devel
 BuildRequires:	glibc-static-devel
-BuildRequires:	libltdl-devel
 BuildRequires:	golang >= 1.26.0
 BuildRequires:	pkgconfig(sqlite3)
 BuildRequires:	go-md2man
@@ -45,7 +44,6 @@ BuildRequires:	pkgconfig(devmapper)
 BuildRequires:	btrfs-devel
 BuildRequires:	pkgconfig(systemd)
 BuildRequires:	systemd
-BuildRequires:	libtool-devel
 BuildRequires:	pkgconfig(libseccomp)
 BuildRequires:	pkgconfig(libnftables)
 BuildRequires:	cmake
