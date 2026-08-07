@@ -12,7 +12,7 @@
 
 Summary:	Automates deployment of containerized applications
 Name:		docker
-Version:	29.7.0
+Version:	29.7.2
 Release:	%{?beta:0.%{beta}.}1
 License:	ASL 2.0
 Group:		System/Configuration/Other
@@ -97,7 +97,7 @@ Provides:	%{repo}-io-vim = %{EVRD}
 This package installs %{summary}.
 
 %prep
-%autosetup -p1 -n moby-docker-v29.7.0
+%autosetup -p1 -n moby-docker-v%{version}%{?beta:-%{beta}}
 find . -name "*~" |xargs rm || :
 
 %build
