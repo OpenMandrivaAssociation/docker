@@ -2,7 +2,10 @@
 
 # Modify these options if you want to change the way the docker daemon runs
 #OPTIONS='--default-runtime=crun'
-OPTIONS='--log-opt max-size=10m --log-opt max-file=3'
+# Log rotation defaults live in /etc/docker/daemon.json: dockerd refuses to
+# start when a key is set both as a flag and in daemon.json, so defaults here
+# would make "log-opts" in daemon.json unusable.
+OPTIONS=''
 DOCKER_CERT_PATH=/etc/docker
 
 # Enable insecure registry communication by appending the registry URL
