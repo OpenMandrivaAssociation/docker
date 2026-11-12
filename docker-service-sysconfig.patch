@@ -1,0 +1,45 @@
+Keep the packaged sysconfig knobs, and do not pull in containerd.service.
+
+docker.service is otherwise contrib/init/systemd/docker.service.
+/etc/sysconfig/docker* is how this package passes OPTIONS,
+DOCKER_STORAGE_OPTIONS, DOCKER_NETWORK_OPTIONS and INSECURE_REGISTRY.
+The default listener stays -H fd:// from docker.socket.
+
+dockerd supervises a private containerd unless OPTIONS or daemon.json
+names a socket. Wants=containerd.service and --containerd= would start
+the system daemon and, on a fresh data root, attach to it.
+
+docker-network-cleanup removes network-scripts ifcfg files for veth and
+docker interfaces. Those files come back as real interfaces after reboot.
+
+--- a/contrib/init/systemd/docker.service
++++ b/contrib/init/systemd/docker.service
+@@ -2,7 +2,7 @@
+ Description=Docker Application Container Engine
+ Documentation=https://docs.docker.com
+ After=network-online.target nss-lookup.target docker.socket firewalld.service containerd.service time-set.target
+-Wants=network-online.target containerd.service
++Wants=network-online.target
+ Requires=docker.socket
+ StartLimitBurst=3
+ StartLimitIntervalSec=60
+@@ -12,7 +12,18 @@
+ # the default is not to use systemd for cgroups because the delegate issues still
+ # exists and systemd currently does not support the cgroup feature set required
+ # for containers run by docker
+-ExecStart=/usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock
++EnvironmentFile=-/etc/sysconfig/docker
++EnvironmentFile=-/etc/sysconfig/docker-storage
++EnvironmentFile=-/etc/sysconfig/docker-network
++# No --containerd here: dockerd supervises a private containerd. Point
++# OPTIONS at /run/containerd/containerd.sock to use containerd.service.
++ExecStart=/usr/bin/dockerd -H fd:// \
++          $OPTIONS \
++          $DOCKER_STORAGE_OPTIONS \
++          $DOCKER_NETWORK_OPTIONS \
++          $INSECURE_REGISTRY
++ExecStartPre=/usr/bin/docker-network-cleanup
++ExecStopPost=/usr/bin/docker-network-cleanup
+ ExecReload=/bin/kill -s HUP $MAINPID
+ TimeoutStartSec=0
+ RestartSec=2

@@ -13,7 +13,7 @@
 Summary:	Automates deployment of containerized applications
 Name:		docker
 Version:	29.9.3
-Release:	%{?beta:0.%{beta}.}3
+Release:	%{?beta:0.%{beta}.}4
 License:	ASL 2.0
 Group:		System/Configuration/Other
 URL:		https://www.docker.com
@@ -22,13 +22,11 @@ Source0:	https://github.com/moby/moby/archive/refs/tags/v%{version}%{?beta:-%{be
 %else
 Source0:	https://github.com/moby/moby/archive/refs/tags/docker-v%{version}.tar.gz
 %endif
-Source1:	%{repo}.service
 Source2:	%{repo}.sysconfig
 Source3:	%{repo}-storage.sysconfig
 Source4:	docker.sysusers
 Source5:	daemon.json
 Source6:	%{repo}-network.sysconfig
-Source7:	%{repo}.socket
 Source8:	%{repo}-network-cleanup.sh
 Source9:	overlay.conf
 # (tpg) taken from https://gist.github.com/goll/bdd6b43c2023f82d15729e9b0067de60
@@ -37,6 +35,9 @@ Source14:	nftables-docker.nft
 # Do not let dockerd abandon its private containerd database when the
 # system socket appears later. See the patch header for the failure mode.
 Patch0:		docker-keep-managed-containerd.patch
+# Sysconfig knobs, and do not force containerd.service. The unit file
+# itself is contrib/init/systemd/docker.service.
+Patch1:		docker-service-sysconfig.patch
 BuildRequires:	gcc
 BuildRequires:	glibc-devel
 BuildRequires:	glibc-static-devel
@@ -138,9 +139,9 @@ SUBSYSTEM=="block", DEVPATH=="/devices/virtual/block/loop*", ATTR{loop/backing_f
 EOF
 # install storage dir
 install -d -m 700 %{buildroot}%{_var}/lib/docker
-# install systemd/init scripts
+# install systemd units from the source tree. docker.service is patched.
 install -d %{buildroot}%{_unitdir}
-install -p -m 644 %{SOURCE1} %{SOURCE7} %{buildroot}%{_unitdir}
+install -p -m 644 contrib/init/systemd/docker.service contrib/init/systemd/docker.socket %{buildroot}%{_unitdir}
 
 # for additional args
 install -d %{buildroot}%{_sysconfdir}/docker/

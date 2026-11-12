@@ -1,5 +1,7 @@
 # /etc/sysconfig/docker-network
+# docker.service listens on docker.socket with -H fd://.
+# Extra listeners can be added here. Do not add another -H for
+# /run/docker.sock: systemd already owns that socket.
 # It's convenient (but insecure) to have docker listening on a tcp port.
 # If you need it, try
-#DOCKER_NETWORK_OPTIONS=-H unix:///var/run/docker.sock -H tcp://127.0.0.1:2375
-DOCKER_NETWORK_OPTIONS=-H unix:///var/run/docker.sock
+#DOCKER_NETWORK_OPTIONS="-H tcp://127.0.0.1:2375"

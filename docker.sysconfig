@@ -1,6 +1,8 @@
 # /etc/sysconfig/docker
 
-# Modify these options if you want to change the way the docker daemon runs
+# Modify these options if you want to change the way the docker daemon runs.
+# docker.service already passes -H fd://. Extra listeners belong in
+# /etc/sysconfig/docker-network.
 #OPTIONS='--default-runtime=crun'
 # dockerd supervises its own containerd, and keeps that database once it
 # exists. To use containerd.service instead, enable it and set the socket
