@@ -13,7 +13,7 @@
 Summary:	Automates deployment of containerized applications
 Name:		docker
 Version:	29.9.3
-Release:	%{?beta:0.%{beta}.}2
+Release:	%{?beta:0.%{beta}.}3
 License:	ASL 2.0
 Group:		System/Configuration/Other
 URL:		https://www.docker.com
@@ -34,6 +34,9 @@ Source9:	overlay.conf
 # (tpg) taken from https://gist.github.com/goll/bdd6b43c2023f82d15729e9b0067de60
 # Not currently used, kept here for reference
 Source14:	nftables-docker.nft
+# Do not let dockerd abandon its private containerd database when the
+# system socket appears later. See the patch header for the failure mode.
+Patch0:		docker-keep-managed-containerd.patch
 BuildRequires:	gcc
 BuildRequires:	glibc-devel
 BuildRequires:	glibc-static-devel
@@ -53,7 +56,10 @@ Requires(pre):	systemd
 Requires:   setup >= 2.9.5
 # For "docker run --init"
 Requires:	tini-static
-# With docker >= 1.11 you now need containerd (and runC or crun as a dep)
+# With docker >= 1.11 you now need containerd (and runC or crun as a dep).
+# dockerd supervises /usr/bin/containerd. It attaches to an already running
+# system containerd only when Docker has no private database yet, or when
+# --containerd / daemon.json "containerd" names that socket explicitly.
 Requires:	containerd >= 0.2.3
 Requires:	crun
 # need xz to work with ubuntu images

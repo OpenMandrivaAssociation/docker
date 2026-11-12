@@ -2,6 +2,10 @@
 
 # Modify these options if you want to change the way the docker daemon runs
 #OPTIONS='--default-runtime=crun'
+# dockerd supervises its own containerd, and keeps that database once it
+# exists. To use containerd.service instead, enable it and set the socket
+# below before creating containers. The two daemons do not share state.
+# OPTIONS='--containerd=/run/containerd/containerd.sock'
 # Log rotation defaults live in /etc/docker/daemon.json: dockerd refuses to
 # start when a key is set both as a flag and in daemon.json, so defaults here
 # would make "log-opts" in daemon.json unusable.

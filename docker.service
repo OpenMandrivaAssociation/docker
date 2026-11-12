@@ -10,6 +10,8 @@ EnvironmentFile=-/etc/sysconfig/docker
 EnvironmentFile=-/etc/sysconfig/docker-storage
 EnvironmentFile=-/etc/sysconfig/docker-network
 Environment=GOTRACEBACK=crash
+# No --containerd here: dockerd supervises a private containerd. Point
+# OPTIONS at /run/containerd/containerd.sock to use containerd.service.
 ExecStart=/usr/sbin/dockerd \
           $OPTIONS \
           $DOCKER_STORAGE_OPTIONS \

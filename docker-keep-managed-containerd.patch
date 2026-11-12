@@ -1,0 +1,93 @@
+dockerd must not switch containerds across restarts.
+
+If dockerd starts while /run/containerd/containerd.sock is absent, it
+supervises its own containerd and records containers in
+<data-root>/containerd/daemon. Starting containerd.service afterwards
+creates that socket. The next dockerd start used to treat the socket as
+authoritative and attach to the system daemon, whose database is
+/var/lib/containerd. Containers from the private database then disappear.
+
+Keep supervising the private containerd when its metadata database is
+already present. A fresh install still attaches to an already-running
+system containerd. --containerd, or "containerd" in daemon.json, still
+selects a socket explicitly.
+
+--- a/daemon/command/daemon.go
++++ b/daemon/command/daemon.go
+@@ -1164,22 +1164,38 @@
+ 	return nil
+ }
+ 
++// managedContainerdMetadata reports whether root holds a containerd
++// metadata database written by a dockerd-managed containerd. Containers
++// created by that daemon are recorded there, not in the system containerd.
++func managedContainerdMetadata(root string) bool {
++	fi, err := os.Stat(filepath.Join(root, "io.containerd.metadata.v1.bolt", "meta.db"))
++	return err == nil && fi.Mode().IsRegular()
++}
++
+ func (cli *daemonCLI) initializeContainerd(ctx context.Context) (func(time.Duration) error, error) {
+ 	systemContainerdAddr, ok, err := systemContainerdRunning(honorXDG)
+ 	if err != nil {
+ 		return nil, errors.Wrap(err, "could not determine whether the system containerd is running")
+ 	}
+-	if ok {
+-		// Use the externally managed system containerd detected at this address.
+-		cli.Config.ContainerdAddr = systemContainerdAddr
+-		return nopWaitFunc, nil
+-	}
+-
+-	log.G(ctx).Info("containerd not running, starting managed containerd")
+ 	rootDir, err := containerdRootDir(ctx, cli.Config)
+ 	if err != nil {
+ 		return nil, err
+ 	}
++	// Adopt an already-running containerd only when Docker has no private
++	// database yet. Once dockerd has supervised its own containerd, a later
++	// appearance of the system socket (for example containerd.service
++	// started afterwards) must not move Docker onto /var/lib/containerd.
++	// An explicit --containerd / "containerd" config value is handled before
++	// this function and still selects that socket.
++	if ok && !managedContainerdMetadata(rootDir) {
++		cli.Config.ContainerdAddr = systemContainerdAddr
++		return nopWaitFunc, nil
++	}
++	if ok {
++		log.G(ctx).WithField("address", systemContainerdAddr).Info("system containerd socket is present, but a private containerd database already exists; keeping the managed containerd")
++	} else {
++		log.G(ctx).Info("containerd not running, starting managed containerd")
++	}
+ 	opts := supervisorOpts(cli.Config)
+ 	r, err := supervisor.New(rootDir, filepath.Join(cli.Config.ExecRoot, "containerd"), opts...)
+ 	if err != nil {
+--- a/daemon/command/daemon_test.go
++++ b/daemon/command/daemon_test.go
+@@ -1,6 +1,7 @@
+ package command
+ 
+ import (
++	"os"
+ 	"path/filepath"
+ 	"runtime"
+ 	"testing"
+@@ -182,6 +183,20 @@
+ 	assert.Check(t, is.Equal("syslog", loadedConfig.LogConfig.Type))
+ }
+ 
++func TestManagedContainerdMetadata(t *testing.T) {
++	root := t.TempDir()
++	assert.Check(t, !managedContainerdMetadata(root))
++
++	db := filepath.Join(root, "io.containerd.metadata.v1.bolt", "meta.db")
++	assert.NilError(t, os.MkdirAll(filepath.Dir(db), 0o700))
++	assert.NilError(t, os.WriteFile(db, []byte("db"), 0o600))
++	assert.Check(t, managedContainerdMetadata(root))
++
++	assert.NilError(t, os.Remove(db))
++	assert.NilError(t, os.Mkdir(db, 0o700))
++	assert.Check(t, !managedContainerdMetadata(root))
++}
++
+ func TestContainerdRootDir(t *testing.T) {
+ 	cfg := config.Config{CommonConfig: config.CommonConfig{Root: t.TempDir()}}
+ 	t.Setenv(containerdRootEnv, "")
