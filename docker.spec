@@ -12,8 +12,8 @@
 
 Summary:	Automates deployment of containerized applications
 Name:		docker
-Version:	29.9.3
-Release:	%{?beta:0.%{beta}.}4
+Version:	29.10.0
+Release:	%{?beta:0.%{beta}.}1
 License:	ASL 2.0
 Group:		System/Configuration/Other
 URL:		https://www.docker.com
@@ -41,7 +41,7 @@ Patch1:		docker-service-sysconfig.patch
 BuildRequires:	gcc
 BuildRequires:	glibc-devel
 BuildRequires:	glibc-static-devel
-BuildRequires:	golang >= 1.26.0
+BuildRequires:	golang >= 1.27.4
 BuildRequires:	pkgconfig(sqlite3)
 BuildRequires:	go-md2man
 BuildRequires:	pkgconfig(devmapper)
